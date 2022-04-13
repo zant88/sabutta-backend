@@ -1,10 +1,16 @@
 <?php
 
 return [
+    // 'class' => 'yii\db\Connection',
+    // 'dsn' => 'mysql:host=db;dbname=pupr',
+    // 'username' => 'root',
+    // 'password' => 'Fasyankes!@#',
+    // 'charset' => 'utf8',
+    
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=db;dbname=pupr',
+    'dsn' => 'mysql:host=172.17.0.2;dbname=pupr',
     'username' => 'root',
-    'password' => 'Fasyankes!@#',
+    'password' => 'PassYankes2021!',
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)
