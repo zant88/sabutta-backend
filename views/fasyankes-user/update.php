@@ -1,0 +1,28 @@
+<?php
+
+use yii\helpers\Html;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\FasyankesUser */
+
+$this->title = Yii::t('app', 'Update {modelClass}: ', [
+    'modelClass' => 'Fasyankes User',
+]) . $model->idfas;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Fasyankes User'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->idfas, 'url' => ['view', 'id' => $model->idfas]];
+$this->params['breadcrumbs'][] = Yii::t('app', 'Update');
+?>
+<div class="fasyankes-user-update">
+<div class="card">
+    <div class="card-header">
+        <h4><?= Html::encode($this->title) ?></h4>
+    </div>
+    <div class="card-body">
+    <?= $this->render('_form', [
+        'model' => $model,
+    ]) ?>
+    </div>
+</div>
+    
+
+</div>
