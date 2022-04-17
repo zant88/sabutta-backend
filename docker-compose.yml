@@ -33,6 +33,30 @@ services:
     volumes:
       - my-db:/var/lib/mysql
   
+  api-service:
+    container_name: sabutta_api-service
+    image: sabutta_api-service
+    build:
+      context: ./java
+    depends_on:
+      - db
+    ports:
+      - "8090:8090"
+    networks:
+      - sabutta
+  
+  proxy-service:
+    container_name: sabutta_proxy-service
+    image: sabutta_proxy-service
+    build:
+      context: ./java/proxy
+    depends_on:
+      - db
+    ports:
+      - "8091:8091"
+    networks:
+      - sabutta
+  
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     links: 
