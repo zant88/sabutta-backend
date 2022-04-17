@@ -53,4 +53,14 @@ class Stock extends \yii\db\ActiveRecord
             'idorder' => Yii::t('app', 'Idorder'),
         ];
     }
+
+    /**
+     * Gets query for [[SalesDetails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWaste()
+    {
+        return $this->hasOne(Jenissampah::className(), ['idjnssampah' => 'idsampah']);
+    }
 }

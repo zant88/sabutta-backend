@@ -1,18 +1,18 @@
 <?php
 
-namespace app\models;
+namespace app\controllers;
 
 use Yii;
-use app\models\Jenissampah;
-use app\models\JenissampahSearch;
+use app\models\Stock;
+use app\models\StockSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * JenissampahController implements the CRUD actions for Jenissampah model.
+ * StockController implements the CRUD actions for Stock model.
  */
-class JenissampahController extends Controller
+class StockController extends Controller
 {
     /**
      * @inheritdoc
@@ -30,12 +30,12 @@ class JenissampahController extends Controller
     }
 
     /**
-     * Lists all Jenissampah models.
+     * Lists all Stock models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new JenissampahSearch();
+        $searchModel = new StockSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -45,7 +45,7 @@ class JenissampahController extends Controller
     }
 
     /**
-     * Displays a single Jenissampah model.
+     * Displays a single Stock model.
      * @param string $id
      * @return mixed
      */
@@ -57,16 +57,16 @@ class JenissampahController extends Controller
     }
 
     /**
-     * Creates a new Jenissampah model.
+     * Creates a new Stock model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Jenissampah();
+        $model = new Stock();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idsampah]);
+            return $this->redirect(['view', 'id' => $model->idstock]);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -75,7 +75,7 @@ class JenissampahController extends Controller
     }
 
     /**
-     * Updates an existing Jenissampah model.
+     * Updates an existing Stock model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param string $id
      * @return mixed
@@ -85,7 +85,7 @@ class JenissampahController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idsampah]);
+            return $this->redirect(['view', 'id' => $model->idstock]);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -94,32 +94,36 @@ class JenissampahController extends Controller
     }
 
     /**
-     * Deletes an existing Jenissampah model.
+     * Deletes an existing Stock model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param string $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-
-        try {
-            $this->findModel($id)->delete();
-        } catch (\yii\db\IntegrityException  $e) {
-            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-        }
-        return $this->redirect(['index']);
+        
+       try
+      {
+        $this->findModel($id)->delete();
+      
+      }
+      catch(\yii\db\IntegrityException  $e)
+      {
+	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+       } 
+         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Jenissampah model based on its primary key value.
+     * Finds the Stock model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param string $id
-     * @return Jenissampah the loaded model
+     * @return Stock the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Jenissampah::findOne($id)) !== null) {
+        if (($model = Stock::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
