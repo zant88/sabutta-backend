@@ -3,16 +3,16 @@
 use yii\helpers\Html;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\Jenissampah */
+/* @var $model app\models\WasteType */
 
 $this->title = Yii::t('app', 'Update {modelClass}: ', [
-    'modelClass' => 'Jenissampah',
-]) . $model->idsampah;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Sampah'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->idsampah, 'url' => ['view', 'id' => $model->idsampah]];
+    'modelClass' => 'Waste Type',
+]) . $model->name;
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Waste Type'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => $model->name, 'url' => ['view', 'id' => $model->id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
-<div class="jenissampah-update">
+<div class="waste-type-update">
     <div class="row">
         <div class="col-lg-8">
             <div class="card">
@@ -22,7 +22,6 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
                 <div class="card-body">
                     <?= $this->render('_form', [
                         'model' => $model,
-                        'mrole' => $mrole,
                     ]) ?>
                 </div>
             </div>

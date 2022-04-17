@@ -13,6 +13,7 @@ use Yii;
  * @property string|null $desc
  * @property string|null $status
  * @property string|null $roleuser
+ * @property int|null $waste_type_id
  */
 class Jenissampah extends \yii\db\ActiveRecord
 {
@@ -30,7 +31,7 @@ class Jenissampah extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['idsampah'], 'required'],
+            [['idsampah', 'waste_type_id'], 'required'],
             [['hargaperkg'], 'number'],
             [['idsampah', 'status'], 'string', 'max' => 20],
             [['nama', 'roleuser'], 'string', 'max' => 100],
@@ -51,6 +52,7 @@ class Jenissampah extends \yii\db\ActiveRecord
             'desc' => Yii::t('app', 'Deskripsi'),
             'status' => Yii::t('app', 'Status'),
             'roleuser' => Yii::t('app', 'Role User'),
+            'waste_type_id' => Yii::t('app', 'Tipe Sampah'),
         ];
     }
 }

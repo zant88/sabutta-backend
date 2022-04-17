@@ -154,12 +154,14 @@ class JenissampahController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $mrole = Mrole::find()->asArray()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
             return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
             return $this->render('update', [
                 'model' => $model,
+                'mrole' => $mrole
             ]);
         }
     }

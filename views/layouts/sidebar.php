@@ -16,7 +16,8 @@ use yii\helpers\Url;
     <li class="menu-header">Master Data</li>
     <li <?= Yii::$app->controller->id == 'fasyankes-user' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/fasyankes-user"]) ?>"><i class="fa fa-route"></i> <span>Pengguna</span></a></li>
     <li <?= Yii::$app->controller->id == 'driver' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/driver"]) ?>"><i class="fa fa-tasks"></i> <span>Pegawai</span></a></li>
-    <li <?= Yii::$app->controller->id == 'jenissampah' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/jenissampah"]) ?>"><i class="fa fa-tasks"></i> <span>Jenis Sampah</span></a></li>
+    <li <?= Yii::$app->controller->id == 'waste-type' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/waste-type"]) ?>"><i class="fa fa-tasks"></i> <span>Jenis Sampah</span></a></li>
+    <li <?= Yii::$app->controller->id == 'jenissampah' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/jenissampah"]) ?>"><i class="fa fa-tasks"></i> <span>Sampah</span></a></li>
     <li <?= Yii::$app->controller->id == 'vendor' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/vendor"]) ?>"><i class="fa fa-tasks"></i> <span>Vendor</span></a></li>
     <li <?= Yii::$app->controller->id == 'sales' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/sales"]) ?>"><i class="fa fa-tasks"></i> <span>Penjualan</span></a></li>
   </ul>
