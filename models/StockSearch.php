@@ -67,6 +67,10 @@ class StockSearch extends Stock
             ->andFilterWhere(['like', 'idjnssampah', $this->idjnssampah])
             ->andFilterWhere(['like', 'jnsstock', $this->jnsstock])
             ->andFilterWhere(['like', 'idorder', $this->idorder]);
+        $query->orderBy([
+            'created_at' => SORT_DESC,
+            'tgl' => SORT_DESC,
+        ]);
 
         return $dataProvider;
     }
