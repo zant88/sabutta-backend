@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\WasteType */
 
 $this->title = $model->name;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Waste Type'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Jenis Sampah'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="waste-type-view">

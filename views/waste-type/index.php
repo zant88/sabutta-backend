@@ -16,7 +16,7 @@ $gridColumns = [
 /* @var $searchModel app\models\WasteTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = Yii::t('app', 'Daftar Waste Type');
+$this->title = Yii::t('app', 'Daftar Jenis Sampah');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="waste-type-index">

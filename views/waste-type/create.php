@@ -6,8 +6,8 @@ use yii\helpers\Html;
 /* @var $this yii\web\View */
 /* @var $model app\models\WasteType */
 
-$this->title = Yii::t('app', 'Waste Type Baru');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Waste Type'), 'url' => ['index']];
+$this->title = Yii::t('app', 'Jenis Sampah Baru');
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Jenis Sampah'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="waste-type-create">

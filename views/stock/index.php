@@ -28,7 +28,13 @@ $gridColumns=[['class' => 'yii\grid\SerialColumn'],
                     return $model->jnsstock;
                 }
             ],
-            'nilai',
+            [
+                'label' => 'Berat (Kg)',
+                'value' => function ($model) {
+                    return $model->nilai;
+                }
+            ],
+            // 'nilai',
             // 'jnsstock',
             // 'idorder',
 

@@ -82,7 +82,7 @@ class SalesController extends Controller
     public function actionSubmitSales()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        // eg. SO00001
+        // eg. SO00001 SO1104220001
         $out = [
             'success' => false,
         ];
@@ -96,18 +96,23 @@ class SalesController extends Controller
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             try {
-                $sales = Sales::find()->orderBy('sales_date DESC')->one();
+                
+                $currDate = date('Y-m-d');
+                $sales = Sales::find()->where([
+                    'DATE(sales_date)' => $currDate
+                ])->orderBy('sales_date DESC')->one();
                 $prevIndex = 0;
                 if ($sales) {
-                    $prevIndex = (int) substr($sales->code, 2);
+                    $prevIndex = (int) substr($sales->code, 8);
                 }
                 $newIndex = $prevIndex + 1;
-                $code = "SO" . str_pad($newIndex, 5, '0', STR_PAD_LEFT);
+                $code = "SO" . date('dmy').str_pad($newIndex, 4, '0', STR_PAD_LEFT);
                 $sales = new Sales();
                 $sales->vendor_id = $_POST['vendor_id'];
                 $sales->code = $code;
                 $sales->sales_date = $_POST['sales_date']. ' ' . date('H:i:s');
                 $sales->total = $_POST['total'];
+                
                 if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
                     foreach ($data as $item) {
@@ -129,6 +134,7 @@ class SalesController extends Controller
                                 $transaction->commit();
                                 $out = [
                                     'success' => true,
+                                    'id' => $sales->id,
                                 ];
                             }
                         }
@@ -141,6 +147,21 @@ class SalesController extends Controller
         }
 
         return $out;
+    }
+
+    /**
+     * Letter to print
+     */
+    public function actionPrint($id) {
+        
+        $model = $this->findModel($id);
+        if ($model) {
+            $this->layout = 'empty';
+            
+            return $this->render('report', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**
