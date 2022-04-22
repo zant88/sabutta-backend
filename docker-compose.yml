@@ -4,7 +4,7 @@ services:
     # image: yiisoftware/yii2-php:7.4-apache
     image: yiisoftware/yii2-php:8.1-apache
     ports:
-      - '6001:80'
+      - '8083:80'
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
@@ -12,7 +12,7 @@ services:
       - sabutta
 
   db:
-    image: mysql:5.7
+    image: mysql/mysql-server:5.7
     networks:
       - sabutta
     environment:
@@ -32,6 +32,7 @@ services:
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
+      - /root/fasyankes/config/db:/etc/mysql
   
   api-service:
     container_name: sabutta_api-service
@@ -53,7 +54,7 @@ services:
     depends_on:
       - db
     ports:
-      - "8091:8091"
+      - "9999:8091"
     networks:
       - sabutta
   
@@ -62,7 +63,7 @@ services:
     links: 
       - db:db
     ports:
-      - 6002:80
+      - 8084:80
     networks:
       - sabutta
     environment:
