@@ -28,6 +28,16 @@ class JenissampahController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['*'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -83,17 +93,20 @@ class JenissampahController extends Controller
         if (isset($_POST['idsampah']) && isset($_POST['items'])) {
             $arrData = json_decode($_POST['items']);
             foreach ($arrData as $item) {
-                $model = VendorWaste::find()->where([
-                    'vendor_id' => $item->id,
-                    'idsampah' => $_POST['idsampah']
-                ])->one();
-                if (!$model) {
-                    $model = new VendorWaste();
+                if (property_exists($item, 'id')) {
+                    $model = VendorWaste::find()->where([
+                        'vendor_id' => $item->id,
+                        'idsampah' => $_POST['idsampah']
+                    ])->one();
+                    if (!$model) {
+                        $model = new VendorWaste();
+                    }
+                    $model->idsampah = $_POST['idsampah'];
+                    $model->vendor_id = $item->id;
+                    $model->price_kg = $item->price;
+                    $model->save();
                 }
-                $model->idsampah = $_POST['idsampah'];
-                $model->vendor_id = $item->id;
-                $model->price_kg = $item->price;
-                $model->save();
+                
                 $out['success'] = true;
                 $out['message'] = 'Data Saved';
             }

@@ -92,4 +92,9 @@ $this->registerJsFile(
   '@web/js/views/waste.js',
   ['depends' => [\yii\web\JqueryAsset::class]]
 );
+
+$this->registerJsFile(
+  '//cdn.jsdelivr.net/npm/sweetalert2@11',
+  ['depends' => [\yii\web\JqueryAsset::class]]
+);
 ?>

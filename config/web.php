@@ -16,8 +16,12 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'aNpSGZ_RkJ8HwH8rxjoOYpZ-F4-X2SJg',
         ],
+        // 'user' => [
+        //     'class' => 'amnah\yii2\user\components\User',
+        // ],
         'user' => [
-            'class' => 'amnah\yii2\user\components\User',
+            'class' => 'app\modules\user\components\User',
+            'identityClass' => 'app\modules\user\models\User',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -50,8 +54,21 @@ $config = [
         ],
     ],
     'modules' => [
+        // 'user' => [
+        //     'class' => 'amnah\yii2\user\Module',
+        //     // set custom module properties here ...
+        // ],
         'user' => [
-            'class' => 'amnah\yii2\user\Module',
+            'class' => 'app\modules\user\Module',
+            'controllerMap' => [
+                // 'default' => 'app\controllers\MyDefaultController',
+                'default' => 'app\modules\user\controllers\DefaultController',
+            ],
+            'modelClasses'  => [
+                'User' => 'app\modules\user\models\User', // note: don't forget component user::identityClass above
+                'Profile' => 'app\modules\user\models\Profile',
+            ],
+            'emailViewPath' => '@app/modules/user/mail',
             // set custom module properties here ...
         ],
         'utility' => [

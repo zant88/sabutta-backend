@@ -61,4 +61,9 @@ class SalesDetail extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Sales::className(), ['id' => 'sales_id']);
     }
+
+    public function getWaste()
+    {
+        return $this->hasOne(Jenissampah::className(), ['idsampah' => 'sampah_id']);
+    }
 }

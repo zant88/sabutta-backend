@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 
+
 class SiteController extends Controller
 {
     /**
@@ -20,10 +21,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout'],
+                // 'only' => ['login'],
                 'rules' => [
                     [
-                        'actions' => ['logout'],
+                        'actions' => ['*'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

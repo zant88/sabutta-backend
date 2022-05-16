@@ -68,7 +68,7 @@ var vm = new Vue({
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
-              window.location.href = '/sales/print/?id=' + response.data.id;
+              window.location.href = '/sales/surat-jalan/?id=' + response.data.id;
             });
           }
         })

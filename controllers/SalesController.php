@@ -11,6 +11,7 @@ use app\models\Vendor;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\data\ActiveDataProvider;
 use yii\db\Query;
 
 /**
@@ -30,6 +31,16 @@ class SalesController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            // 'access' => [
+            //     'class' => \yii\filters\AccessControl::class,
+            //     'rules' => [
+            //         [
+            //             'allow' => true,
+            //             'actions' => ['*'],
+            //             'roles' => ['@'],
+            //         ],
+            //     ],
+            // ],
         ];
     }
 
@@ -55,8 +66,12 @@ class SalesController extends Controller
      */
     public function actionView($id)
     {
+        $dataProvider = new ActiveDataProvider([
+            'query' => SalesDetail::find()->where(['sales_id' => $id]),
+        ]);
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -96,7 +111,7 @@ class SalesController extends Controller
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             try {
-                
+
                 $currDate = date('Y-m-d');
                 $sales = Sales::find()->where([
                     'DATE(sales_date)' => $currDate
@@ -106,13 +121,13 @@ class SalesController extends Controller
                     $prevIndex = (int) substr($sales->code, 8);
                 }
                 $newIndex = $prevIndex + 1;
-                $code = "SO" . date('dmy').str_pad($newIndex, 4, '0', STR_PAD_LEFT);
+                $code = "SO" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
                 $sales = new Sales();
                 $sales->vendor_id = $_POST['vendor_id'];
                 $sales->code = $code;
-                $sales->sales_date = $_POST['sales_date']. ' ' . date('H:i:s');
+                $sales->sales_date = $_POST['sales_date'] . ' ' . date('H:i:s');
                 $sales->total = $_POST['total'];
-                
+
                 if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
                     foreach ($data as $item) {
@@ -122,25 +137,25 @@ class SalesController extends Controller
                         $salesDetail->amount_kg = $item->weight;
                         $salesDetail->total_price = $item->weight * $item->harga;
                         if ($salesDetail->validate()) {
-                            $salesDetail->save();
-                            $stock = new Stock();
-                            $stock->idstock = (string) round(microtime(true) * 1000);
-                            $stock->idjnssampah = $item->id;
-                            $stock->nilai = $item->weight;
-                            $stock->jnsstock = 'OUT';
-                            $stock->tgl = $_POST['sales_date'];
-                            if ($stock->validate()) {
-                                $stock->save();
-                                $transaction->commit();
-                                $out = [
-                                    'success' => true,
-                                    'id' => $sales->id,
-                                ];
+                            if ($salesDetail->save()) {
+                                $stock = new Stock();
+                                $stock->idstock = (string) round(microtime(true) * 1000);
+                                $stock->idjnssampah = $item->id;
+                                $stock->nilai = $item->weight;
+                                $stock->jnsstock = 'OUT';
+                                $stock->tgl = $_POST['sales_date'];
+                                if ($stock->validate()) {
+                                    $stock->save();
+                                    $transaction->commit();
+                                    $out = [
+                                        'success' => true,
+                                        'id' => $sales->id,
+                                    ];
+                                }
                             }
                         }
                     }
                 }
-                
             } catch (\Exception $e) {
                 $transaction->rollback();
             }
@@ -152,13 +167,71 @@ class SalesController extends Controller
     /**
      * Letter to print
      */
-    public function actionPrint($id) {
+    public function actionPrintSuratJalan($id)
+    {
+
+        $model = $this->findModel($id);
+        $code = $this->generateSuratJalanCode();
+        if ($model) {
+            $this->layout = 'empty';
+
+            return $this->render('report', [
+                'model' => $model,
+                'code' => $code
+            ]);
+        }
+    }
+
+    public function actionSuratJalan($id)
+    {
+        $model = $this->findModel($id);
+        if ($model) {
+            if ($model->load(Yii::$app->request->post())) {
+                if (!$model->surat_jalan_code) {
+                    $model->surat_jalan_code = $this->generateSuratJalanCode();
+                }
+                if ($model->save()) {
+                    return $this->redirect(['print-surat-jalan', 'id' => $model->id]);
+                }
+            }
+
+            return $this->render('surat-jalan', [
+                'model' => $model,
+            ]);
+        } else {
+            // return $this->redirect(['index']);
+        }
+    }
+
+    private function generateSuratJalanCode()
+    {
+        $currMonth = date('n');
+        $currYear = date('Y');
+        $strWhere = "MONTH(sales_date) = '$currMonth' AND YEAR(sales_date) = '$currYear' 
+        AND surat_jalan_code IS NOT null";
+        $sales = Sales::find()->where($strWhere)->orderBy('sales_date DESC')->one();
+        $prevIndex = 0;
         
+        if ($sales) {
+            $prevIndex = (int) substr($sales->surat_jalan_code, 2);
+        }
+        $newIndex = $prevIndex + 1;
+
+        $code = str_pad($newIndex, 3, '0', STR_PAD_LEFT) . "/" . date('m') . "/ETS/" . date('Y');
+        return $code;
+    }
+
+    /**
+     * Letter to print
+     */
+    public function actionInvoice($id)
+    {
+
         $model = $this->findModel($id);
         if ($model) {
             $this->layout = 'empty';
-            
-            return $this->render('report', [
+
+            return $this->render('invoice', [
                 'model' => $model,
             ]);
         }

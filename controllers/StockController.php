@@ -8,6 +8,8 @@ use app\models\StockSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\models\Jenissampah;
+use app\models\JenissampahSearch;
 
 /**
  * StockController implements the CRUD actions for Stock model.
@@ -26,6 +28,16 @@ class StockController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['*'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -39,6 +51,28 @@ class StockController extends Controller
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    /**
+     * Lists all Stock models.
+     * @return mixed
+     */
+    public function actionCard()
+    {
+        // $searchModel = new StockSearch();
+        // $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        // return $this->render('card', [
+        //     'searchModel' => $searchModel,
+        //     'dataProvider' => $dataProvider,
+        // ]);
+
+        $searchModel = new JenissampahSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+        return $this->render('card', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
@@ -101,17 +135,13 @@ class StockController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

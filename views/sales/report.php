@@ -2,15 +2,15 @@
   <div class="header-container" style="display: flex; justify-content: space-between; margin-bottom: 30px">
     <div class="title-part">
       <h3 style="font-weight: bold; margin-bottom: 0;">SURAT JALAN</h3>
-      <p style="margin-bottom: 0">No. <b>SO01244444M</b></p>
+      <p style="margin-bottom: 0">No. <b><?= $model->surat_jalan_code ?></b></p>
     </div>
     <div class="description-part">
-      <p style="margin-bottom: 0;" class="date">Jakarta, 20 April 2022</p>
-      <p style="margin-bottom: 0; font-weight: bold" class="vendor-name">PT GOA</p>
+      <p style="margin-bottom: 0;" class="date"><?= $model->place ?>, <?= Yii::$app->formatter->asDate($model->generated_date_surat_jalan, 'php:j F Y') ?></p>
+      <p style="margin-bottom: 0; font-weight: bold" class="vendor-name"><?= $model->vendor->name ?></p>
     </div>
   </div>
   <div class="description-container">
-    <p>Kami kirimkan barang-barang tersebut di bawah ini dengan kendaraan COLT Diesel dengna No Polisi B 3212 IHB</p>
+    <p><?= $model->description ?></p>
   </div>
   <div class="content">
     <table class="table">
@@ -22,21 +22,18 @@
         </tr>
       </thead>
       <tbody>
+        <?php 
+        foreach ($model->salesDetails as $key => $item) {
+          ?>
         <tr>
-          <th scope="row">1</th>
-          <td>Mark</td>
-          <td>2</td>
+          <th scope="row"><?= $key + 1 ?></th>
+          <td><?= $item->waste->nama ?></td>
+          <td><?= $item->amount_kg ?></td>
         </tr>
-        <tr>
-          <th scope="row">2</th>
-          <td>Jacob</td>
-          <td>3</td>
-        </tr>
-        <tr>
-          <th scope="row">3</th>
-          <td>Larry</td>
-          <td>30</td>
-        </tr>
+          
+          <?php
+        }
+        ?>
       </tbody>
     </table>
   </div>
@@ -54,7 +51,8 @@
       <br />
       <br />
       <br />
-      <p>.............</p>
+      <p style="margin-bottom: 0; line-height: 1"><b><?= $model->hormat_kami_name ?></b></p>
+      <p><?= $model->hormat_kami_position ?></p>
     </div>
   </div>
 </div>
