@@ -24,7 +24,7 @@ class SiteController extends Controller
                 // 'only' => ['login'],
                 'rules' => [
                     [
-                        'actions' => ['*'],
+                        'actions' => ['index', 'contact', 'about', 'get-total-user', 'get-total-sales'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -53,6 +53,50 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    /**
+     * get Total User
+     */
+    public function actionGetTotalUser() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+
+        $query = (new \yii\db\Query())->from('mfasyankes')->where("role='0101#BS-USER'");
+        $totalBSUser = $query->count('*');
+        $out = [
+            'success' => true,
+            'data' => $totalBSUser
+        ];
+
+        return $out;
+    }
+
+    /**
+     * get Total User
+     */
+    public function actionGetTotalSales() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $date = date('Y-m-d');
+        $query = (new \yii\db\Query())->from('sales')
+            ->where("DATE(sales_date)='$date'");
+        $totalSales = $query->sum('total');
+        if (!$totalSales) {
+            $totalSales = 0;
+        }
+        $out = [
+            'success' => true,
+            'data' => $totalSales
+        ];
+
+        return $out;
     }
 
     /**

@@ -32,7 +32,7 @@ class DriverController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['*'],
+                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -75,7 +75,7 @@ class DriverController extends Controller
     {
         $model = new Driver();
         $mrole = Mrole::find()->asArray()->all();
-        
+
         if ($model->load(Yii::$app->request->post())) {
             $model->telppersh = $model->telpdriver;
             $model->userid = $model->iddriver;
@@ -123,17 +123,13 @@ class DriverController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

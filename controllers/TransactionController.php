@@ -3,16 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\FasyankesUser;
-use app\models\FasyankesUserSearch;
+use app\models\Transaction;
+use app\models\TransactionSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * FasyankesUserController implements the CRUD actions for FasyankesUser model.
+ * TransactionController implements the CRUD actions for Transaction model.
  */
-class FasyankesUserController extends Controller
+class TransactionController extends Controller
 {
     /**
      * @inheritdoc
@@ -26,26 +26,16 @@ class FasyankesUserController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'create', 'reset-password', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
         ];
     }
 
     /**
-     * Lists all FasyankesUser models.
+     * Lists all Transaction models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new FasyankesUserSearch();
+        $searchModel = new TransactionSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -55,8 +45,31 @@ class FasyankesUserController extends Controller
     }
 
     /**
-     * Displays a single FasyankesUser model.
-     * @param string $id
+     * get aggregation of cash transaction
+     * 
+     */
+    public function actionSumCash() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+
+        $query = (new \yii\db\Query())->from('transaction');
+        $cashIn = $query->sum('cash_in');
+        $query2 = (new \yii\db\Query())->from('transaction');
+        $cashOut = $query2->sum('cash_out');
+        $out = [
+            'success' => true,
+            'data' => $cashIn - $cashOut
+        ];
+
+        return $out;
+    }
+
+    /**
+     * Displays a single Transaction model.
+     * @param integer $id
      * @return mixed
      */
     public function actionView($id)
@@ -67,16 +80,17 @@ class FasyankesUserController extends Controller
     }
 
     /**
-     * Creates a new FasyankesUser model.
+     * Creates a new Transaction model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new FasyankesUser();
+        $model = new Transaction();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idfas]);
+            Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -84,27 +98,10 @@ class FasyankesUserController extends Controller
         }
     }
 
-    public function actionResetPassword() {
-        if (isset($_POST['id'])) {
-            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-            $out = ['success' => false];
-        
-            $model = FasyankesUser::findOne($_POST['id']);
-            if ($model) {
-                $model->pass = md5('enviro');
-                $model->save();
-                $out = ['success' => true];
-                return $out;
-            }
-        }else {
-            return $this->render('reset-password');
-        }
-    }
-
     /**
-     * Updates an existing FasyankesUser model.
+     * Updates an existing Transaction model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionUpdate($id)
@@ -112,7 +109,8 @@ class FasyankesUserController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idfas]);
+            Yii::$app->session->setFlash('success', "Data telah berhasil diubah!");
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,
@@ -121,36 +119,32 @@ class FasyankesUserController extends Controller
     }
 
     /**
-     * Deletes an existing FasyankesUser model.
+     * Deletes an existing Transaction model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**
-     * Finds the FasyankesUser model based on its primary key value.
+     * Finds the Transaction model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return FasyankesUser the loaded model
+     * @param integer $id
+     * @return Transaction the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = FasyankesUser::findOne($id)) !== null) {
+        if (($model = Transaction::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

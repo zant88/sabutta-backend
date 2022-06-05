@@ -33,7 +33,7 @@ class JenissampahController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['*'],
+                        'actions' => ['index', 'view', 'get-vendor-waste', 'save-data', 'create', 'sampah-vendor', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],
@@ -62,20 +62,22 @@ class JenissampahController extends Controller
      */
     public function actionView($id)
     {
-        
+
         return $this->render('view', [
             'model' => $this->findModel($id)
         ]);
     }
 
-    public function actionGetVendorWaste($idsampah) {
+    public function actionGetVendorWaste($idsampah)
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = [];
         $vendorWaste = VendorWaste::find()->where([
-            'idsampah' => $idsampah])->all();
+            'idsampah' => $idsampah
+        ])->all();
         foreach ($vendorWaste as $vendor) {
             $out[] = [
-                'vendor_id' => $vendor->vendor_id, 
+                'vendor_id' => $vendor->vendor_id,
                 'name' => $vendor->vendor->name,
                 'price_kg' => $vendor->price_kg
             ];
@@ -83,9 +85,10 @@ class JenissampahController extends Controller
         return $out;
     }
 
-    public function actionSaveData() {
+    public function actionSaveData()
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        
+
         $out = [
             'success' => false,
             'message' => 'No Valid Data'
@@ -106,7 +109,7 @@ class JenissampahController extends Controller
                     $model->price_kg = $item->price;
                     $model->save();
                 }
-                
+
                 $out['success'] = true;
                 $out['message'] = 'Data Saved';
             }
@@ -134,7 +137,8 @@ class JenissampahController extends Controller
             ]);
         }
     }
-    public function actionDataSampah() {
+    public function actionDataSampah()
+    {
         echo 'hehe';
         die;
     }
@@ -143,14 +147,15 @@ class JenissampahController extends Controller
      * Get waste based on vendor
      * 
      */
-    public function actionSampahVendor($id) {
+    public function actionSampahVendor($id)
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = [];
         $model = VendorWaste::find()->where(['vendor_id' => $id])->all();
         foreach ($model as $item) {
             $out[] = [
                 'id' => $item->idsampah,
-                'price' => $item->price_kg, 
+                'price' => $item->price_kg,
                 'waste_name' => $item->waste->nama
             ];
         }
@@ -187,17 +192,13 @@ class JenissampahController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

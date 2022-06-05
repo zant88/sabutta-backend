@@ -31,16 +31,16 @@ class SalesController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
-            // 'access' => [
-            //     'class' => \yii\filters\AccessControl::class,
-            //     'rules' => [
-            //         [
-            //             'allow' => true,
-            //             'actions' => ['*'],
-            //             'roles' => ['@'],
-            //         ],
-            //     ],
-            // ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'create', 'submit-sales', 'print-surat-jalan', 'invoice', 'update', 'delete', 'surat-jalan'],
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
 
@@ -127,7 +127,6 @@ class SalesController extends Controller
                 $sales->code = $code;
                 $sales->sales_date = $_POST['sales_date'] . ' ' . date('H:i:s');
                 $sales->total = $_POST['total'];
-
                 if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
                     foreach ($data as $item) {

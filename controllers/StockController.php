@@ -33,7 +33,7 @@ class StockController extends Controller
                 'rules' => [
                     [
                         'allow' => true,
-                        'actions' => ['*'],
+                        'actions' => ['index', 'card', 'view', 'create', 'update', 'delete'],
                         'roles' => ['@'],
                     ],
                 ],

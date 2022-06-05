@@ -22,7 +22,8 @@
         "c006/yii2-migration-utility": ">=2.0.4",
         "bizley/migration": "^4.3",
         "kartik-v/yii2-widget-select2": "@dev",
-        "kartik-v/yii2-widget-datepicker": "dev-master"
+        "kartik-v/yii2-widget-datepicker": "dev-master",
+        "kartik-v/yii2-number": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
