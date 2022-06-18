@@ -12,13 +12,18 @@ use app\models\Stock;
  */
 class StockSearch extends Stock
 {
+    public $startDate;
+    public $endDate;
+    public $wasteName;
+    public $trxType;
+    public $userName;
     /**
      * @inheritdoc
      */
     public function rules()
     {
         return [
-            [['idstock', 'idjnssampah', 'tgl', 'jnsstock', 'idorder'], 'safe'],
+            [['idstock', 'idjnssampah', 'tgl', 'jnsstock', 'idorder', 'startDate', 'endDate', 'wasteName', 'trxType', 'userName'], 'safe'],
             [['nilai'], 'number'],
         ];
     }
@@ -58,11 +63,26 @@ class StockSearch extends Stock
         }
 
         // grid filtering conditions
+        if ($this->startDate !=null && $this->endDate != null) {
+            $query->where("tgl BETWEEN '$this->startDate' AND '$this->endDate'");
+        }
+        if ($this->wasteName != null) {
+            $query->joinWith('waste')->andFilterWhere(['like', 'nama', $this->wasteName]);
+        }
+        if ($this->trxType != null) {
+            $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
+        }
+        if ($this->userName != null) {
+            $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);
+        }
         $query->andFilterWhere([
             'nilai' => $this->nilai,
             'tgl' => $this->tgl,
         ]);
-
+        $query->andFilterWhere([
+            'nilai' => $this->nilai,
+            'tgl' => $this->tgl,
+        ]);
         $query->andFilterWhere(['like', 'idstock', $this->idstock])
             ->andFilterWhere(['like', 'idjnssampah', $this->idjnssampah])
             ->andFilterWhere(['like', 'jnsstock', $this->jnsstock])
@@ -73,5 +93,21 @@ class StockSearch extends Stock
         ]);
 
         return $dataProvider;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'idstock' => Yii::t('app', 'Idstock'),
+            'idjnssampah' => Yii::t('app', 'Idjnssampah'),
+            'nilai' => Yii::t('app', 'Nilai'),
+            'tgl' => Yii::t('app', 'Tgl'),
+            'jnsstock' => Yii::t('app', 'Masuk / Keluar'),
+            'idorder' => Yii::t('app', 'Idorder'),
+            'trxType' => Yii::t('app', 'Jenis Transaksi'),
+        ];
     }
 }

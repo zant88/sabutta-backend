@@ -34,7 +34,7 @@ class Jenissampah extends \yii\db\ActiveRecord
             [['idsampah', 'waste_type_id'], 'required'],
             [['hargaperkg'], 'number'],
             [['idsampah', 'status'], 'string', 'max' => 20],
-            [['nama', 'roleuser'], 'string', 'max' => 100],
+            [['nama'], 'string', 'max' => 100],
             [['desc'], 'string', 'max' => 255],
             [['idsampah'], 'unique'],
         ];

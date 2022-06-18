@@ -4,6 +4,7 @@ use app\models\WasteType;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\helpers\ArrayHelper;
+use kartik\select2\Select2;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Jenissampah */
@@ -29,15 +30,25 @@ use yii\helpers\ArrayHelper;
       <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
     </div>
     <div class="col-lg-6">
-      <?= $form->field($model, 'status')->textInput(['maxlength' => true]) ?>
-    </div>
-    <div class="col-lg-6">
-      <?= $form->field($model, 'roleuser')
+      <?= $form->field($model, 'status')
         ->dropDownList(
-          ArrayHelper::map($mrole, 'idrole', 'namarole'),
-          ['prompt' => '', 'id' => 'roleuser_id']
+          ['AKTIF' => 'AKTIF', 'NON AKTIF' => 'NON AKTIF'],
+          ['prompt' => '', 'id' => 'waste_type_id']
         ); ?>
     </div>
+    <!-- <div class="col-lg-6">
+      <?= 
+      $form->field($model, 'roleuser')->widget(Select2::classname(), [
+        'data' => ArrayHelper::map($mrole, 'idrole', 'namarole'),
+        'options' => ['placeholder' => 'Select a state ...'],
+        'pluginOptions' => [
+            'allowClear' => true,
+            'multiple' => true
+        ],
+    ]);
+      ?>
+     
+    </div> -->
     <div class="col-lg-6">
       <?php
       $wasteType = WasteType::find()->orderBy('name')->all();

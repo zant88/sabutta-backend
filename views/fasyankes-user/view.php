@@ -7,7 +7,7 @@ use yii\widgets\DetailView;
 /* @var $model app\models\FasyankesUser */
 
 $this->title = $model->idfas;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Fasyankes User'), 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar  User'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="fasyankes-user-view">

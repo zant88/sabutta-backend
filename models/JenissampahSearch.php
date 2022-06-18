@@ -58,10 +58,14 @@ class JenissampahSearch extends Jenissampah
         }
 
         // grid filtering conditions
+        $query->where([
+            'status' => 'AKTIF'
+        ]);
+
         $query->andFilterWhere([
             'hargaperkg' => $this->hargaperkg,
         ]);
-
+        
         $query->andFilterWhere(['like', 'idsampah', $this->idsampah])
             ->andFilterWhere(['like', 'nama', $this->nama])
             ->andFilterWhere(['like', 'desc', $this->desc])

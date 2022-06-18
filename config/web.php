@@ -16,6 +16,13 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'aNpSGZ_RkJ8HwH8rxjoOYpZ-F4-X2SJg',
         ],
+        // 'assetManager' => [
+        //     'bundles' => [
+        //         'kartik\form\ActiveFormAsset' => [
+        //             'bsDependencyEnabled' => false // do not load bootstrap assets for a specific asset bundle
+        //         ],
+        //     ],
+        // ],
         // 'user' => [
         //     'class' => 'amnah\yii2\user\components\User',
         // ],
@@ -77,6 +84,10 @@ $config = [
         'migration' => [
             'class' => 'bizley\migration\controllers\MigrationController',
         ],
+        'gridview' => [
+            'class' => 'kartik\grid\Module',
+            // other module settings
+        ]
     ],
     'params' => $params,
 ];

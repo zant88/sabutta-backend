@@ -19,7 +19,7 @@ use yii\helpers\Url;
     <li <?= Yii::$app->controller->action->id == 'card' && Yii::$app->controller->id == 'stock' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/stock/card"]) ?>"><i class="fa fa-tasks"></i> <span>Kartu Stok</span></a></li>
     <li <?= Yii::$app->controller->id == 'waste-type' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/waste-type"]) ?>"><i class="fa fa-tasks"></i> <span>Jenis Sampah</span></a></li>
     <li <?= Yii::$app->controller->id == 'jenissampah' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/jenissampah"]) ?>"><i class="fa fa-tasks"></i> <span>Sampah</span></a></li>
-    <li <?= Yii::$app->controller->id == 'stock' && Yii::$app->controller->action->id == 'index'? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/stock"]) ?>"><i class="fa fa-tasks"></i> <span>Transaksi Sampah</span></a></li>
+    <li <?= Yii::$app->controller->id == 'stock' && Yii::$app->controller->action->id == 'index'? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/stock"]) ?>"><i class="fa fa-tasks"></i> <span>Transaksi Harian</span></a></li>
     <li <?= Yii::$app->controller->id == 'transaction' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/transaction"]) ?>"><i class="fa fa-tasks"></i> <span>Arus Kas</span></a></li>
     <li <?= Yii::$app->controller->id == 'vendor' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/vendor"]) ?>"><i class="fa fa-tasks"></i> <span>Vendor</span></a></li>
     <li <?= Yii::$app->controller->id == 'sales' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/sales"]) ?>"><i class="fa fa-tasks"></i> <span>Penjualan</span></a></li>

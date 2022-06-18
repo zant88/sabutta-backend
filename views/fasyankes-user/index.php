@@ -7,10 +7,9 @@ use yii\widgets\Pjax;
 
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
-    'alamat',
-    'telp',
-    'fax',
-    'owner',
+    // 'alamat',
+    // 'fax',
+    // 'owner',
     // 'namapetugas',
     // 'jabatanpetugas',
     // 'npwp',
@@ -27,7 +26,7 @@ $gridColumns = [
     // 'notandapersh',
     // 'userid',
     // 'pass',
-    // 'namafas',
+    'namafas',
     // 'ttdmanagement',
     // 'ttdclient',
     // 'lat',
@@ -35,8 +34,11 @@ $gridColumns = [
     // 'tokenfb',
     // 'role',
     // 'tglinput',
-    // 'nip',
-    // 'nik',
+    'nip',
+    'nik',
+    'telp',
+    'email:email',
+    
     // 'saldo',
 
 

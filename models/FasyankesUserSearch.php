@@ -93,6 +93,8 @@ class FasyankesUserSearch extends FasyankesUser
             ->andFilterWhere(['like', 'role', $this->role])
             ->andFilterWhere(['like', 'nip', $this->nip])
             ->andFilterWhere(['like', 'nik', $this->nik]);
+        
+        $query->orderBy('namafas');
 
         return $dataProvider;
     }

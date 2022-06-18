@@ -128,7 +128,9 @@ class JenissampahController extends Controller
         $model = new Jenissampah();
         $mrole = Mrole::find()->asArray()->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model->roleuser = Yii::$app->params['default_role'];
+            $model->save();
             return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
             return $this->render('create', [
@@ -174,7 +176,22 @@ class JenissampahController extends Controller
         $model = $this->findModel($id);
         $mrole = Mrole::find()->asArray()->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+
+            // keep this comment in case role put in update as well
+            // if (isset($_POST['Jenissampah']['roleuser'])) {
+            //     $strRole = '';
+            //     foreach ($_POST['Jenissampah']['roleuser'] as $item) {
+            //         if ($strRole == '') {
+            //             $strRole = $strRole.$item;
+            //         }else {
+            //             $strRole = $strRole."#".$item;
+            //         }
+                    
+            //     }
+            // }
+            // $model->roleuser = Yii::$app->params['default_role'];
+            $model->save();
             return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
             return $this->render('update', [
@@ -194,7 +211,9 @@ class JenissampahController extends Controller
     {
 
         try {
-            $this->findModel($id)->delete();
+            $model = $this->findModel($id);
+            $model->status = "NON AKTIF";
+            $model->save();
         } catch (\yii\db\IntegrityException  $e) {
             Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
         }

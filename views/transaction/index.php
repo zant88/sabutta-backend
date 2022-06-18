@@ -5,6 +5,7 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use yii\web\View;
+use kartik\export\ExportMenu;
 
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
@@ -19,6 +20,7 @@ $gridColumns = [
     ['class' => 'app\widgets\grid\ActionColumn'],
 
 ];
+
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\TransactionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -39,6 +41,15 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?= Html::a('Transaction Baru', ['create'], ['class' => 'btn btn-success']) ?>
 
+            </p>
+            <p>
+                <?php 
+                // Renders a export dropdown menu
+                echo ExportMenu::widget([
+                    'dataProvider' => $dataProvider,
+                    'columns' => $gridColumns
+                ]);
+                ?>
             </p>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
