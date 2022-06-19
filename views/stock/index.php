@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
     [
-        'label' => 'User',
+        'label' => 'Pengguna',
         'value' => function ($model) {
             $order = Order::findOne($model->idorder);
             if ($order) {
@@ -140,3 +140,16 @@ $this->params['breadcrumbs'][] = $this->title;
     </div>
     
 </div>
+
+<?php 
+$this->registerCssFile("@web/css/daterangepicker.css", [], 'css-print-theme');
+$this->registerJsFile(
+    '@web/js/moment.js',
+    ['depends' => [\yii\web\JqueryAsset::class]]
+  );
+  
+$this->registerJsFile(
+    '@web/js/daterangepicker.js',
+    ['depends' => [\yii\web\JqueryAsset::class]]
+  );
+?>

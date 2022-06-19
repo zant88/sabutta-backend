@@ -108,6 +108,8 @@ class StockSearch extends Stock
             'jnsstock' => Yii::t('app', 'Masuk / Keluar'),
             'idorder' => Yii::t('app', 'Idorder'),
             'trxType' => Yii::t('app', 'Jenis Transaksi'),
+            'wasteName' => Yii::t('app', 'Nama Sampah'),
+            'userName' => Yii::t('app', 'Pengguna'),
         ];
     }
 }
