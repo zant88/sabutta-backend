@@ -73,12 +73,32 @@ $gridColumns = [
     [
         'label' => 'Tanggal',
         'value' => function ($model) {
-            $myDateTime = DateTime::createFromFormat('Y-m-d', $model->tgl);
-            $newDateString = $myDateTime->format('d/m/Y');
-
-            return $newDateString;
+            if ($model->jnsstock == 'IN') {
+                $order = Order::findOne($model->idorder);
+                $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $order->tanggalinput);
+                if ($myDateTime) {
+                    $newDateString = $myDateTime->format('d/m/Y H:i:s');
+                }else {
+                    $newDateString = '-';
+                }
+                return $newDateString;    
+            }else {
+                return '-';
+            }
         }
     ],
+    // [
+    //     'label' => 'Tanggal',
+    //     'value' => function ($model) {
+    //         if ($model->jnsstock == 'IN') {
+
+    //         }
+    //         $myDateTime = DateTime::createFromFormat('Y-m-d', $model->tgl);
+    //         $newDateString = $myDateTime->format('d/m/Y');
+
+    //         return $newDateString;
+    //     }
+    // ],
     [
         'label' => 'Keluar / Masuk',
         'value' => function ($model) {
