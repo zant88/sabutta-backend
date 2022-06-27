@@ -65,7 +65,6 @@ $gridColumns = [
   </div>
   <div class="col-lg-8">
     <?= Html::a(Yii::t('app', 'Buat/Edit Surat Jalan'), ['surat-jalan', 'id' => $model->id], ['class' => 'btn btn-success mr-2']) ?>
-    <?= Html::a(Yii::t('app', 'Print Invoice'), ['surat-jalan', 'id' => $model->id], ['class' => 'btn btn-primary mr-2']) ?>
-    <?= Html::a(Yii::t('app', 'Update Stok Barang'), ['surat-jalan', 'id' => $model->id], ['class' => 'btn btn-primary mr-2']) ?>
+    <?= Html::a(Yii::t('app', 'Print Invoice'), ['print-surat-jalan', 'id' => $model->id], ['class' => 'btn btn-primary mr-2']) ?>
   </div>
 </div>
