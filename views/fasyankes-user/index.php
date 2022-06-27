@@ -53,7 +53,6 @@ $this->title = Yii::t('app', 'Daftar Pengguna');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="fasyankes-user-index">
-    <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); 
     ?>
 
@@ -65,12 +64,15 @@ $this->params['breadcrumbs'][] = $this->title;
             <p>
                 <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-success']) ?>
             </p>
+            <?php Pjax::begin(); ?>
+    
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
                 'columns' => $gridColumns,
             ]); ?>
+            <?php Pjax::end(); ?>
         </div>
     </div>
-    <?php Pjax::end(); ?>
+    
 </div>
