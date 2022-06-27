@@ -56,7 +56,7 @@ class Driver extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'iddriver' => Yii::t('app', 'Iddriver'),
+            'iddriver' => Yii::t('app', 'ID Pegawai'),
             'nama' => Yii::t('app', 'Nama'),
             'nmperusahaan' => Yii::t('app', 'Nama Perusahaan'),
             'telppersh' => Yii::t('app', 'Telp. Perushaaan'),
