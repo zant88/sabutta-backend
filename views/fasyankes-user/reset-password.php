@@ -48,7 +48,7 @@ $listData=ArrayHelper::map($users, 'idfas','namafas');
 
 <?php 
 $this->registerJsFile(
-  'https://unpkg.com/select2@4.0.3/dist/js/select2.js',
+  'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
   ['depends' => [\yii\web\JqueryAsset::class]]
 );
 
