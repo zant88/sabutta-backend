@@ -23,6 +23,7 @@ use yii\helpers\Url;
     <li <?= Yii::$app->controller->id == 'transaction' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/transaction"]) ?>"><i class="fa fa-tasks"></i> <span>Arus Kas</span></a></li>
     <li <?= Yii::$app->controller->id == 'vendor' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/vendor"]) ?>"><i class="fa fa-tasks"></i> <span>Vendor</span></a></li>
     <li <?= Yii::$app->controller->id == 'sales' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/sales"]) ?>"><i class="fa fa-tasks"></i> <span>Penjualan</span></a></li>
+    <li <?= Yii::$app->controller->id == 'invoice' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/invoice"]) ?>"><i class="fa fa-tasks"></i> <span>Invoice</span></a></li>
     <li <?= Yii::$app->controller->id == 'report' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/report"]) ?>"><i class="fa fa-tasks"></i> <span>Report</span></a></li>
   </ul>
 </aside>

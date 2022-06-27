@@ -21,22 +21,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= $form->errorSummary($model) ?>
             <div class="row">
               <div class="col-lg-6">
-                <?= $form->field($model, 'generated_date_surat_jalan')->widget(DatePicker::classname(), [
-                    'options' => ['placeholder' => 'Enter generated date'],
-                    'pluginOptions' => [
-                        'autoclose' => true,
-                        'format' => 'yyyy-mm-dd'
-                    ]
-                ]); ?>
+                <?= $form->field($model, 'hormat_kami_name')->textInput(['maxlength' => true]) ?>
               </div>
               <div class="col-lg-6">
                 <?= $form->field($model, 'description')->textArea() ?>
               </div>
               <div class="col-lg-6">
                 <?= $form->field($model, 'place')->textInput() ?>
-              </div>
-              <div class="col-lg-6">
-                <?= $form->field($model, 'hormat_kami_name')->textInput(['maxlength' => true]) ?>
               </div>
               <div class="col-lg-6">
                 <?= $form->field($model, 'hormat_kami_position')->textInput(['maxlength' => true]) ?>

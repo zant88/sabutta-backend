@@ -19,6 +19,7 @@ use Yii;
  * @property string|null $place
  * @property string|null $hormat_kami_name
  * @property string|null $hormat_kami_position
+ * @property int|null $invoiced
  *
  * @property SalesDetail[] $salesDetails
  * @property Vendor $vendor
@@ -40,7 +41,7 @@ class Sales extends \yii\db\ActiveRecord
     {
         return [
             [['vendor_id', 'code', 'sales_date', 'total'], 'required'],
-            [['vendor_id', 'total'], 'integer'],
+            [['vendor_id', 'total', 'invoiced'], 'integer'],
             [['sales_date', 'generated_date_surat_jalan'], 'safe'],
             [['description'], 'string'],
             [['code', 'status'], 'string', 'max' => 255],
@@ -68,6 +69,7 @@ class Sales extends \yii\db\ActiveRecord
             'place' => Yii::t('app', 'Place'),
             'hormat_kami_name' => Yii::t('app', 'Hormat Kami Name'),
             'hormat_kami_position' => Yii::t('app', 'Hormat Kami Position'),
+            'invoiced' => Yii::t('app', 'Diinvoice'),
         ];
     }
 

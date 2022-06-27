@@ -22,7 +22,13 @@ $gridColumns = [
         }
     ],
     'sales_date',
-    'total',
+    // 'total',
+    [
+        'label' => 'Total',
+        'value' => function ($model) {
+            return number_format($model->total);
+        }
+    ],
     [
         'class' => ActionColumn::className(),
         // 'contentOptions' => ['style' => 'width: 7%'],
@@ -34,14 +40,6 @@ $gridColumns = [
                     aria-label='Delete' data-pjax='0' data-confirm='Are you sure you want to delete this item?'
                     data-method='post'><i class='fa fa-trash' aria-hidden=''></i></a>";
             },
-            // 'surat-jalan' => function ($url) {
-            //     return "<a class='btn btn-sm btn-primary btn-round' href='$url' title='Print Surat Jalan' 
-            //     aria-label='Print Surat Jalan' data-pjax='0'><i class='fa fa-print' aria-hidden=''></i></a>";
-            // },
-            // 'print-invoice' => function ($url) {
-            //     return "<a class='btn btn-sm btn-primary btn-round' href='$url' title='Print Invoice' 
-            //     aria-label='Print Invoice' data-pjax='0'><i class='fa fa-file-import' aria-hidden=''></i></a>";
-            // },
         ],
     ],
     // ['class' => ActionColumn::className(),'template'=>'{delete} {view}' ] 

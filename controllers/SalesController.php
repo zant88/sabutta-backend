@@ -94,6 +94,26 @@ class SalesController extends Controller
         }
     }
 
+    /**
+     * Generate code for sales code
+     * 
+     */
+
+    private function generateSalesCode() {
+        $currDate = date('Y-m-d');
+        $sales = Sales::find()->where([
+            'DATE(sales_date)' => $currDate
+        ])->orderBy('sales_date DESC')->one();
+        $prevIndex = 0;
+        if ($sales) {
+            $prevIndex = (int) substr($sales->code, 8);
+        }
+        $newIndex = $prevIndex + 1;
+        $code = "SO" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
+        
+        return $code;
+    }
+
     public function actionSubmitSales()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
@@ -111,20 +131,9 @@ class SalesController extends Controller
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             try {
-
-                $currDate = date('Y-m-d');
-                $sales = Sales::find()->where([
-                    'DATE(sales_date)' => $currDate
-                ])->orderBy('sales_date DESC')->one();
-                $prevIndex = 0;
-                if ($sales) {
-                    $prevIndex = (int) substr($sales->code, 8);
-                }
-                $newIndex = $prevIndex + 1;
-                $code = "SO" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
                 $sales = new Sales();
                 $sales->vendor_id = $_POST['vendor_id'];
-                $sales->code = $code;
+                $sales->code = $this->generateSalesCode();
                 $sales->sales_date = $_POST['sales_date'] . ' ' . date('H:i:s');
                 $sales->total = $_POST['total'];
                 if ($sales->validate() && $sales->save()) {
@@ -145,7 +154,6 @@ class SalesController extends Controller
                                 $stock->tgl = $_POST['sales_date'];
                                 if ($stock->validate()) {
                                     $stock->save();
-                                    $transaction->commit();
                                     $out = [
                                         'success' => true,
                                         'id' => $sales->id,
@@ -154,6 +162,7 @@ class SalesController extends Controller
                             }
                         }
                     }
+                    $transaction->commit();     
                 }
             } catch (\Exception $e) {
                 $transaction->rollback();
@@ -186,6 +195,7 @@ class SalesController extends Controller
         $model = $this->findModel($id);
         if ($model) {
             if ($model->load(Yii::$app->request->post())) {
+                $model->generated_date_surat_jalan = $model->sales_date;
                 if (!$model->surat_jalan_code) {
                     $model->surat_jalan_code = $this->generateSuratJalanCode();
                 }
@@ -210,9 +220,8 @@ class SalesController extends Controller
         AND surat_jalan_code IS NOT null";
         $sales = Sales::find()->where($strWhere)->orderBy('sales_date DESC')->one();
         $prevIndex = 0;
-        
         if ($sales) {
-            $prevIndex = (int) substr($sales->surat_jalan_code, 2);
+            $prevIndex = (int) substr($sales->surat_jalan_code, 0, 3);
         }
         $newIndex = $prevIndex + 1;
 
