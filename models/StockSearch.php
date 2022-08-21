@@ -70,7 +70,16 @@ class StockSearch extends Stock
             $query->joinWith('waste')->andFilterWhere(['like', 'nama', $this->wasteName]);
         }
         if ($this->trxType != null) {
-            $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
+            if ($this->trxType == 'TPST-GABRUKAN') {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
+            }else if ($this->trxType == 'TPST-TERURAI') {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
+            }else {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
+            }
+            
         }
         if ($this->userName != null) {
             $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);

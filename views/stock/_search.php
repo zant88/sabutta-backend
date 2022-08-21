@@ -43,7 +43,8 @@ use yii\web\View;
             <?= $form->field($model, 'trxType')->dropDownList(
                 [
                     'BANK SAMPAH' => 'BANK SAMPAH',
-                    'TPST' => 'TPST'
+                    'TPST-GABRUKAN' => 'TPST GABRUKAN',
+                    'TPST-TERURAI' => 'TPST TERURAI',
                 ], 
                 ['prompt'=>'Jenis Transaksi']); ?>
         </div>
