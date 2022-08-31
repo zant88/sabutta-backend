@@ -105,6 +105,95 @@ class StockSearch extends Stock
     }
 
     /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchWeight($params)
+    {
+        $query = Stock::find();
+
+        $this->load($params);
+
+        if ($this->startDate !=null && $this->endDate != null) {
+            $query->where("tgl BETWEEN '$this->startDate' AND '$this->endDate'");
+        }
+        if ($this->wasteName != null) {
+            $query->joinWith('waste')->andFilterWhere(['like', 'nama', $this->wasteName]);
+        }
+        if ($this->trxType != null) {
+            if ($this->trxType == 'TPST-GABRUKAN') {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
+            }else if ($this->trxType == 'TPST-TERURAI') {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
+            }else {
+                $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
+            }
+            
+        }
+        if ($this->userName != null) {
+            $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);
+        }
+        $query->andFilterWhere([
+            'nilai' => $this->nilai,
+            'tgl' => $this->tgl,
+        ]);
+        $query->andFilterWhere(['like', 'idstock', $this->idstock])
+            ->andFilterWhere(['like', 'idjnssampah', $this->idjnssampah])
+            ->andFilterWhere(['like', 'jnsstock', $this->jnsstock])
+            ->andFilterWhere(['like', 'idorder', $this->idorder]);
+        $query->orderBy([
+            'created_at' => SORT_DESC,
+            'tgl' => SORT_DESC,
+        ]);
+
+        return number_format($query->sum('nilai'), 3, ',', '.');
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
+    public function searchBalance($params)
+    {
+        $query = Order::find();
+        $query->joinWith('orderDetails.waste');
+        $this->load($params);
+
+        if ($this->startDate !=null && $this->endDate != null) {
+            $query->where("tanggalinput BETWEEN '$this->startDate' AND '$this->endDate'");
+        }
+        if ($this->wasteName != null) {
+            $query->andFilterWhere(['like', 'nama', $this->wasteName]);
+        }
+        if ($this->trxType != null) {
+            if ($this->trxType == 'TPST-GABRUKAN') {
+                $query->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
+            }else if ($this->trxType == 'TPST-TERURAI') {
+                $query->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
+                $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
+            }else {
+                $query->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
+            }
+            
+        }
+        
+        if ($this->userName != null) {
+            $query->joinWith('user')->andFilterWhere(['like', 'namafas', $this->userName]);
+        }
+        
+        return number_format($query->sum('harga'), 0, ',', '.');
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function attributeLabels()
