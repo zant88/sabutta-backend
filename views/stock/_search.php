@@ -45,7 +45,7 @@ use yii\web\View;
         [
           'BANK SAMPAH' => 'BANK SAMPAH',
           'TPST-GABRUKAN' => 'TPST GABRUKAN',
-          'TPST-TERURAI' => 'TPST TERURAI',
+          'TPST-TERURAI' => 'TPST TERPILAH',
         ],
         ['prompt' => 'Jenis Transaksi']
       ); ?>
