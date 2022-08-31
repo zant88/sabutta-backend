@@ -49,4 +49,9 @@ class Orderdetail extends \yii\db\ActiveRecord
             'harga' => Yii::t('app', 'Harga'),
         ];
     }
+
+    public function getWaste()
+    {
+        return $this->hasOne(Jenissampah::className(), ['idsampah' => 'idsampah']);
+    }
 }

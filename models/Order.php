@@ -75,4 +75,9 @@ class Order extends \yii\db\ActiveRecord
     {
         return $this->hasOne(FasyankesUser::className(), ['idfas' => 'idfasyankes']);
     }
+
+    public function getOrderDetails()
+    {
+        return $this->hasMany(Orderdetail::className(), ['orderid' => 'idorder']);
+    }
 }
