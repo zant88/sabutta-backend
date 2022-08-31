@@ -11,109 +11,98 @@ use kartik\export\ExportMenu;
 use yii\widgets\ActiveForm;
 
 $gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
-    [
-        'label' => 'Pengguna',
-        'value' => function ($model) {
-            $order = Order::findOne($model->idorder);
-            if ($order) {
-                if ($order->idfasyankes != null) {
-                    $user = FasyankesUser::findOne($order->idfasyankes);
-                    return $user->namafas;
-                }else {
-                    return '-';
-                }
-            }else {
-                return '-';
-            }
+  ['class' => 'yii\grid\SerialColumn'],
+  [
+    'label' => 'Pengguna',
+    'value' => function ($model) {
+      $order = Order::findOne($model->idorder);
+      if ($order) {
+        if ($order->idfasyankes != null) {
+          $user = FasyankesUser::findOne($order->idfasyankes);
+          return $user->namafas;
+        } else {
+          return '-';
         }
-    ],
-    [
-        'label' => 'Nama Sampah',
-        'value' => function ($model) {
-            $waste = Jenissampah::findOne($model->idjnssampah);
-            return $waste->nama;
+      } else {
+        return '-';
+      }
+    }
+  ],
+  [
+    'label' => 'Nama Sampah',
+    'value' => function ($model) {
+      $waste = Jenissampah::findOne($model->idjnssampah);
+      return $waste->nama;
+    }
+  ],
+  [
+    'label' => 'Tipe Sampah',
+    'value' => function ($model) {
+      $waste = Jenissampah::findOne($model->idjnssampah);
+      if ($waste->waste_type_id != null) {
+        $wasteType = WasteType::findOne($waste->waste_type_id);
+        return $wasteType->name;
+      } else {
+        return '-';
+      }
+    }
+  ],
+  [
+    'label' => 'Jenis Transaksi',
+    'value' => function ($model) {
+      $order = Order::findOne($model->idorder);
+      $ret = '-';
+      if ($order) {
+        if ($order->lokasipenjemputan) {
+          if (strtoupper(substr($order->lokasipenjemputan, 0, 4))  == 'TPST') {
+            $ret = 'TPST';
+          } else {
+            $ret = strtoupper($order->lokasipenjemputan);
+          }
+        } else {
+          $ret = '-';
         }
-    ],
-    [
-        'label' => 'Tipe Sampah',
-        'value' => function ($model) {
-            $waste = Jenissampah::findOne($model->idjnssampah);
-            if ($waste->waste_type_id != null) {
-                $wasteType = WasteType::findOne($waste->waste_type_id);
-                return $wasteType->name;
-            }else {
-                return '-';
-            }
-        }
-    ],
-    [
-        'label' => 'Jenis Transaksi',
-        'value' => function ($model) {
-            $order = Order::findOne($model->idorder);
-            $ret = '-';
-            if ($order) {
-                if ($order->lokasipenjemputan) {
-                    if (strtoupper(substr($order->lokasipenjemputan, 0, 4))  == 'TPST') {
-                        $ret = 'TPST';
-                    }else {
-                        $ret = strtoupper($order->lokasipenjemputan);
-                    }
-                }else {
-                    $ret = '-';
-                }
-            }else {
-                return '-';
-            }
-            
-            
-            return $ret;
-        }
-    ],
-    [
-        'label' => 'Tanggal',
-        'value' => function ($model) {
-            if ($model->jnsstock == 'IN') {
-                $order = Order::findOne($model->idorder);
-                $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $order->tanggalinput);
-                if ($myDateTime) {
-                    $newDateString = $myDateTime->format('d/m/Y H:i:s');
-                }else {
-                    $newDateString = '-';
-                }
-                return $newDateString;    
-            }else {
-                return '-';
-            }
-        }
-    ],
-    // [
-    //     'label' => 'Tanggal',
-    //     'value' => function ($model) {
-    //         if ($model->jnsstock == 'IN') {
-
-    //         }
-    //         $myDateTime = DateTime::createFromFormat('Y-m-d', $model->tgl);
-    //         $newDateString = $myDateTime->format('d/m/Y');
-
-    //         return $newDateString;
-    //     }
-    // ],
-    [
-        'label' => 'Keluar / Masuk',
-        'value' => function ($model) {
-            return $model->jnsstock;
-        }
-    ],
-    [
-        'label' => 'Berat (Kg)',
-        'value' => function ($model) {
-            return $model->nilai;
-        }
-    ],
+      } else {
+        return '-';
+      }
 
 
-    //  ['class' => 'app\widgets\grid\ActionColumn'],
+      return $ret;
+    }
+  ],
+  [
+    'label' => 'Tanggal',
+    'value' => function ($model) {
+      if ($model->jnsstock == 'IN') {
+        $order = Order::findOne($model->idorder);
+        $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $order->tanggalinput);
+        if ($myDateTime) {
+          $newDateString = $myDateTime->format('d/m/Y H:i:s');
+        } else {
+          $newDateString = '-';
+        }
+        return $newDateString;
+      } else {
+        return '-';
+      }
+    }
+  ],
+  [
+    'label' => 'Keluar / Masuk',
+    'value' => function ($model) {
+      return $model->jnsstock;
+    }
+  ],
+  [
+    'label' => 'Berat (Kg)',
+    'value' => function ($model) {
+      return $model->nilai;
+    }
+  ],
+  
+
+
+  //  ['class' => 'app\widgets\grid\ActionColumn'],
 
 ];
 
@@ -125,51 +114,45 @@ $this->title = Yii::t('app', 'Transaksi Harian');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="stock-index">
-    <div class="card">
-        <div class="card-header">
-            <h4><?= Html::encode($this->title) ?></h4>
-        </div>
-        <div class="card-body">
-            <?php 
-                echo ExportMenu::widget([
-                    'dataProvider' => $dataProviderExport,
-                    'columns' => $gridColumns,
-                ]); ?>
-            <?php Pjax::begin(); ?>
-    
+  <div class="card">
+    <div class="card-header">
+      <h4><?= Html::encode($this->title) ?></h4>
+    </div>
+    <div class="card-body">
+      <?php
+      echo ExportMenu::widget([
+        'dataProvider' => $dataProviderExport,
+        'columns' => $gridColumns,
+      ]); ?>
+      <?php Pjax::begin(); ?>
+      <div class="action-row">
+        <?php echo $this->render('_search', ['model' => $searchModel, 'dataProviderExport' => $dataProviderExport, 'gridColumns' => $gridColumns]); ?>
+      </div>
 
-    
-            <div class="action-row">
-                
-                
-                <?php echo $this->render('_search', ['model' => $searchModel, 'dataProviderExport' => $dataProviderExport, 'gridColumns' => $gridColumns]); ?>
-            </div>
-            
-            
-            
-            <!-- <p> 
+      <!-- <p> 
         <?= Html::a(Yii::t('app', 'Stock Baru'), ['create'], ['class' => 'btn btn-success']) ?>
     </p> -->
-            <?= GridView::widget([
-                'dataProvider' => $dataProvider,
-                'filterModel' => $searchModel,
-                'columns' => $gridColumns,
-            ]); ?>
-        </div>
-        <?php Pjax::end(); ?>
+    <p><b>Berat &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?= $weight ?> Kg</b><br />
+    <b>Jumlah (Rp) : <?= $balance ?></b></p>
+      <?= GridView::widget([
+        'dataProvider' => $dataProvider,
+        'filterModel' => $searchModel,
+        'columns' => $gridColumns,
+      ]); ?>
     </div>
-    
+    <?php Pjax::end(); ?>
+  </div>
 </div>
 
-<?php 
+<?php
 $this->registerCssFile("@web/css/daterangepicker.css", [], 'css-print-theme');
 $this->registerJsFile(
-    '@web/js/moment.js',
-    ['depends' => [\yii\web\JqueryAsset::class]]
-  );
-  
+  '@web/js/moment.js',
+  ['depends' => [\yii\web\JqueryAsset::class]]
+);
+
 $this->registerJsFile(
-    '@web/js/daterangepicker.js',
-    ['depends' => [\yii\web\JqueryAsset::class]]
-  );
+  '@web/js/daterangepicker.js',
+  ['depends' => [\yii\web\JqueryAsset::class]]
+);
 ?>

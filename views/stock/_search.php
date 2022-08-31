@@ -12,57 +12,60 @@ use yii\web\View;
 
 <div class="stock-search">
 
-    <?php $form = ActiveForm::begin([
-        'action' => ['index'],
-        'method' => 'get',
-        'options' => [
-            'data-pjax' => 1,
-            'id' => 'frm-search'
+  <?php $form = ActiveForm::begin([
+    'action' => ['index'],
+    'method' => 'get',
+    'options' => [
+      'data-pjax' => 1,
+      'id' => 'frm-search'
+    ],
+  ]); ?>
+
+  <div class="row">
+    <div class="col-lg-6">
+      <?= $form->field($model, 'startDate')->textInput(['class' => 'form-control datepicker']) ?>
+    </div>
+    <div class="col-lg-6">
+      <?= $form->field($model, 'endDate')->textInput(['class' => 'form-control datepicker']) ?>
+    </div>
+    <div class="col-lg-6">
+      <?= $form->field($model, 'jnsstock')->dropDownList(
+        [
+          'IN' => 'MASUK',
+          'OUT' => 'KELUAR'
         ],
-    ]); ?>
-    
-    <div class="row">
-        <div class="col-lg-6">
-            <?= $form->field($model, 'startDate')->textInput(['class' => 'form-control datepicker']) ?>
-        </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'endDate')->textInput(['class' => 'form-control datepicker']) ?>
-        </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'jnsstock')->dropDownList(
-                [
-                    'IN' => 'MASUK',
-                    'OUT' => 'KELUAR'
-                ], 
-                ['prompt'=>'Keluar / Masuk']); ?>
-        </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'wasteName') ?>
-        </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'trxType')->dropDownList(
-                [
-                    'BANK SAMPAH' => 'BANK SAMPAH',
-                    'TPST-GABRUKAN' => 'TPST GABRUKAN',
-                    'TPST-TERURAI' => 'TPST TERURAI',
-                ], 
-                ['prompt'=>'Jenis Transaksi']); ?>
-        </div>
-        <!-- <div class="col-lg-6">
+        ['prompt' => 'Keluar / Masuk']
+      ); ?>
+    </div>
+    <div class="col-lg-6">
+      <?= $form->field($model, 'wasteName') ?>
+    </div>
+    <div class="col-lg-6">
+      <?= $form->field($model, 'trxType')->dropDownList(
+        [
+          'BANK SAMPAH' => 'BANK SAMPAH',
+          'TPST-GABRUKAN' => 'TPST GABRUKAN',
+          'TPST-TERURAI' => 'TPST TERURAI',
+        ],
+        ['prompt' => 'Jenis Transaksi']
+      ); ?>
+    </div>
+    <!-- <div class="col-lg-6">
             <?= $form->field($model, 'trxType') ?>
         </div> -->
-        <div class="col-lg-6">
-            <?= $form->field($model, 'userName') ?>
-        </div>
+    <div class="col-lg-6">
+      <?= $form->field($model, 'userName') ?>
     </div>
-    
-    <?php // echo $form->field($model, 'idorder') ?>
+  </div>
 
-    <div class="form-group">
-        <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
-    </div>
+  <?php // echo $form->field($model, 'idorder') 
+  ?>
 
-    <?php ActiveForm::end(); ?>
+  <div class="form-group">
+    <?= Html::submitButton(Yii::t('app', 'Search'), ['class' => 'btn btn-primary']) ?>
+  </div>
+
+  <?php ActiveForm::end(); ?>
 
 </div>
 
@@ -84,10 +87,10 @@ $('#frm-search').submit(function( event ) {
   });
 
   
-  "; 
+  ";
 $this->registerJs(
-    $script,
-    View::POS_READY,
-    'my-button-handler'
+  $script,
+  View::POS_READY,
+  'my-button-handler'
 );
 ?>
