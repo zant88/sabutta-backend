@@ -65,6 +65,8 @@ class StockSearch extends Stock
         // grid filtering conditions
         if ($this->startDate !=null && $this->endDate != null) {
             $query->where("tgl BETWEEN '$this->startDate' AND '$this->endDate'");
+        }else {
+            $query->where("tgl BETWEEN '".date('Y-m-d')."' AND '".date('Y-m-d')."'");
         }
         if ($this->wasteName != null) {
             $query->joinWith('waste')->andFilterWhere(['like', 'nama', $this->wasteName]);
@@ -119,6 +121,8 @@ class StockSearch extends Stock
 
         if ($this->startDate !=null && $this->endDate != null) {
             $query->where("tgl BETWEEN '$this->startDate' AND '$this->endDate'");
+        }else {
+            $query->where("tgl BETWEEN '".date('Y-m-d')."' AND '".date('Y-m-d')."'");
         }
         if ($this->wasteName != null) {
             $query->joinWith('waste')->andFilterWhere(['like', 'nama', $this->wasteName]);
@@ -169,6 +173,8 @@ class StockSearch extends Stock
 
         if ($this->startDate !=null && $this->endDate != null) {
             $query->where("tanggalinput BETWEEN '$this->startDate' AND '$this->endDate'");
+        }else {
+            $query->where("tanggalinput BETWEEN '".date('Y-m-d')."' AND '".date('Y-m-d')."'");
         }
         if ($this->wasteName != null) {
             $query->andFilterWhere(['like', 'nama', $this->wasteName]);
