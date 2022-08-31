@@ -185,7 +185,7 @@ class StockSearch extends Stock
                 $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
             }else if ($this->trxType == 'TPST-TERPILAH') {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
-                $query->andFilterWhere(['jnsTrxRequest1' => 'HASIL_GABRUKAN']);
+                $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
             }else {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
             }
