@@ -75,7 +75,7 @@ class StockSearch extends Stock
             if ($this->trxType == 'TPST-GABRUKAN') {
                 $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
                 $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
-            }else if ($this->trxType == 'TPST-TERURAI') {
+            }else if ($this->trxType == 'TPST-TERPILAH') {
                 $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
                 $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
             }else {
@@ -131,7 +131,7 @@ class StockSearch extends Stock
             if ($this->trxType == 'TPST-GABRUKAN') {
                 $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
                 $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
-            }else if ($this->trxType == 'TPST-TERURAI') {
+            }else if ($this->trxType == 'TPST-TERPILAH') {
                 $query->joinWith('order')->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
                 $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
             }else {
@@ -183,9 +183,9 @@ class StockSearch extends Stock
             if ($this->trxType == 'TPST-GABRUKAN') {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
                 $query->andFilterWhere(['<>', 'jnsTrxRequest', 'HASIL_GABRUKAN']);
-            }else if ($this->trxType == 'TPST-TERURAI') {
+            }else if ($this->trxType == 'TPST-TERPILAH') {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', 'TPST']);
-                $query->andFilterWhere(['jnsTrxRequest' => 'HASIL_GABRUKAN']);
+                $query->andFilterWhere(['jnsTrxRequest1' => 'HASIL_GABRUKAN']);
             }else {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
             }
