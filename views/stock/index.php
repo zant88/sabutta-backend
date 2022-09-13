@@ -132,8 +132,7 @@ $this->params['breadcrumbs'][] = $this->title;
       <!-- <p> 
         <?= Html::a(Yii::t('app', 'Stock Baru'), ['create'], ['class' => 'btn btn-success']) ?>
     </p> -->
-    <p><b>Berat &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?= $weight ?> Kg</b><br />
-    <b>Jumlah (Rp) : <?= $balance ?></b></p>
+    <p><b>Berat &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: <?= $weight ?> Kg</b></p>
       <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
