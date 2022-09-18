@@ -75,8 +75,18 @@ class FasyankesUserController extends Controller
     {
         $model = new FasyankesUser();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idfas]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->pass = md5('enviro');
+            if ($model->validate() && $model->save()) {
+                
+                if (isset($_POST['type']) && $_POST['type'] == 'is_add_new') {
+                    Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                    return $this->redirect(['create']);
+                }else {
+                    Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                    return $this->redirect(['index']);
+                }
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -84,11 +94,12 @@ class FasyankesUserController extends Controller
         }
     }
 
-    public function actionResetPassword() {
+    public function actionResetPassword()
+    {
         if (isset($_POST['id'])) {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
             $out = ['success' => false];
-        
+
             $model = FasyankesUser::findOne($_POST['id']);
             if ($model) {
                 $model->pass = md5('enviro');
@@ -96,7 +107,7 @@ class FasyankesUserController extends Controller
                 $out = ['success' => true];
                 return $out;
             }
-        }else {
+        } else {
             return $this->render('reset-password');
         }
     }
@@ -128,17 +139,13 @@ class FasyankesUserController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

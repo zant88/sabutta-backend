@@ -63,6 +63,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <p>
                 <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-success']) ?>
+                <?= Html::a(Yii::t('app', 'New User'), ['create'], ['class' => 'btn btn-primary']) ?>
             </p>
             <?php Pjax::begin(); ?>
     
