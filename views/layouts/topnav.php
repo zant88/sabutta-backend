@@ -1,6 +1,7 @@
 <?php
- use yii\helpers\Url;
-  use yii\bootstrap4\Dropdown;
+
+use yii\helpers\Url;
+use yii\bootstrap4\Dropdown;
 ?>
 <form class="form-inline mr-auto" action="">
   <ul class="navbar-nav mr-3">
@@ -33,31 +34,28 @@
           </div>
         </a>
 
-    </div>
+      </div>
   </li>
   <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-    <img alt="image" src="<?=Url::to(["img/avatar/avatar-1.png"])?>" class="rounded-circle mr-1">
-    <div class="d-sm-none d-lg-inline-block">Hi, Ehsan Basri </div></a>
-       <?php
-          echo Dropdown::widget([
-              'items' => [
-                  ['label' => '<i class="far fa-user"></i> Profile Settings
-      </a>', 'encode' =>false, 'url' => '#',
-      "linkOptions" =>["class" =>"dropdown-item has-icon"]
+      <img alt="image" src="<?= Url::to(["img/avatar/avatar-1.png"]) ?>" class="rounded-circle mr-1">
+      <div class="d-sm-none d-lg-inline-block">Hi, Ehsan Basri </div>
+    </a>
+    <?php
+    echo Dropdown::widget([
+      'items' => [
+        [
+          'label' => '<i class="fas fa-sign-out-alt"></i> Logout
+      </a>', 'encode' => false, 'url' => ['/user/logout'],
+
+          "linkOptions" => ["data-method" => "POST", "class" => "dropdown-item has-icon text-danger"]
+
+        ],
       ],
-      [
-      'label' => '<i class="fas fa-sign-out-alt"></i> Logout
-      </a>', 'encode' => false, 'url' => ['/site/logout'],
-
-      "linkOptions" => [ "data-method" => "POST", "class" => "dropdown-item has-icon text-danger"]
-
-    ],
-              ],
-            "class" => "dropdown-menu dropdown-menu-right"
-          ]);
+      "class" => "dropdown-menu dropdown-menu-right"
+    ]);
 
 
-      ?>
+    ?>
 
   </li>
 </ul>
