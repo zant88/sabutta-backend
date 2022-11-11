@@ -1,12 +1,18 @@
+<?php 
+use app\models\Vendor;
+
+$vendor = Vendor::findOne($model->vendor_id);
+?>
 <div class="container-letter" style="width: 1000px; padding: 30px">
   <div class="header-container" style="display: flex; justify-content: space-between; margin-bottom: 30px">
     <div class="title-part">
       <h3 style="font-weight: bold; margin-bottom: 0;">SURAT JALAN</h3>
       <p style="margin-bottom: 0">No. <b><?= $model->surat_jalan_code ?></b></p>
     </div>
-    <div class="description-part">
+    <div class="description-part" style="width: 300px">
       <p style="margin-bottom: 0;" class="date"><?= $model->place ?>, <?= Yii::$app->formatter->asDate($model->generated_date_surat_jalan, 'php:j F Y') ?></p>
       <p style="margin-bottom: 0; font-weight: bold" class="vendor-name"><?= $model->vendor->name ?></p>
+      <p style="margin-bottom: 0;" class="vendor-address"><?= $vendor->address ?></p>
     </div>
   </div>
   <div class="description-container">

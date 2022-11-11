@@ -5,8 +5,15 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use app\widgets\grid\ActionColumn;
-
+ 
 $gridColumns=[['class' => 'yii\grid\SerialColumn'], 
+            [
+                'format' => 'raw',
+                'label' => 'Code',
+                'value' => function ($model) {
+                    return "<a href='/invoice/print-invoice/?id=$model->id'>$model->code</a>";
+                }
+            ],
             'code',
             'date',
             'hormat_kami_name',
