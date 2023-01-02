@@ -10,11 +10,12 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\models\Jenissampah;
 use app\models\JenissampahSearch;
+use app\components\MyController;
 
 /**
  * StockController implements the CRUD actions for Stock model.
  */
-class StockController extends Controller
+class StockController extends MyController
 {
     /**
      * @inheritdoc

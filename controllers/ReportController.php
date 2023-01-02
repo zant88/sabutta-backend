@@ -5,8 +5,9 @@ use app\models\Vsumpilahan;
 use Yii;
 use yii\web\Controller;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
-class ReportController extends Controller 
+class ReportController extends MyController 
 {
     /**
      * @inheritdoc

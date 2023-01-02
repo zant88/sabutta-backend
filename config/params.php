@@ -14,5 +14,8 @@ return [
         'kas_masuk' => 'KAS MASUK',
         'kas_keluar' => 'KAS KELUAR'
     ],
+    'print_copy' => [
+        'Perusahaan', 'Vendor'
+    ],
     'report_password' => 'Sabuta!'
 ];

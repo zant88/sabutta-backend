@@ -3,18 +3,16 @@
 namespace app\controllers;
 
 use Yii;
-use app\models\Driver;
-use app\models\DriverSearch;
-use app\models\Mrole;
+use app\models\AuthMaster;
+use app\models\AuthMasterSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-use app\components\MyController;
 
 /**
- * DriverController implements the CRUD actions for Driver model.
+ * AuthMasterController implements the CRUD actions for AuthMaster model.
  */
-class DriverController extends MyController
+class AuthMasterController extends Controller
 {
     /**
      * @inheritdoc
@@ -28,27 +26,18 @@ class DriverController extends MyController
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
         ];
     }
 
     /**
-     * Lists all Driver models.
+     * Lists all AuthMaster models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new DriverSearch();
+        $searchModel = new AuthMasterSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -56,8 +45,8 @@ class DriverController extends MyController
     }
 
     /**
-     * Displays a single Driver model.
-     * @param string $id
+     * Displays a single AuthMaster model.
+     * @param integer $id
      * @return mixed
      */
     public function actionView($id)
@@ -68,81 +57,73 @@ class DriverController extends MyController
     }
 
     /**
-     * Creates a new Driver model.
+     * Creates a new AuthMaster model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Driver();
-        $mrole = Mrole::find()->asArray()->all();
+        $model = new AuthMaster();
 
-        if ($model->load(Yii::$app->request->post())) {
-            $model->telppersh = $model->telpdriver;
-            $model->userid = $model->iddriver;
-            $model->pass = md5('enviro');
-            if ($model->validate()) {
-                $model->save();
-                Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
-                return $this->redirect(['index']);
-            }
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('create', [
                 'model' => $model,
-                'mrole' => $mrole,
             ]);
         }
     }
 
     /**
-     * Updates an existing Driver model.
+     * Updates an existing AuthMaster model.
      * If update is successful, the browser will be redirected to the 'view' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $mrole = Mrole::find()->asArray()->all();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
-            return $this->redirect(['index']);
+            return $this->redirect(['view', 'id' => $model->id]);
         } else {
             return $this->render('update', [
                 'model' => $model,
-                'mrole' => $mrole
             ]);
         }
     }
 
     /**
-     * Deletes an existing Driver model.
+     * Deletes an existing AuthMaster model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param string $id
+     * @param integer $id
      * @return mixed
      */
     public function actionDelete($id)
     {
-
-        try {
-            $this->findModel($id)->delete();
-        } catch (\yii\db\IntegrityException  $e) {
-            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-        }
-        return $this->redirect(['index']);
+        
+       try
+      {
+        $this->findModel($id)->delete();
+      
+      }
+      catch(\yii\db\IntegrityException  $e)
+      {
+	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+       } 
+         return $this->redirect(['index']);
     }
 
     /**
-     * Finds the Driver model based on its primary key value.
+     * Finds the AuthMaster model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param string $id
-     * @return Driver the loaded model
+     * @param integer $id
+     * @return AuthMaster the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Driver::findOne($id)) !== null) {
+        if (($model = AuthMaster::findOne($id)) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

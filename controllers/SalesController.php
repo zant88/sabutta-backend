@@ -13,11 +13,13 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use app\components\MyController;
+use kartik\mpdf\Pdf;
 
 /**
  * SalesController implements the CRUD actions for Sales model.
  */
-class SalesController extends Controller
+class SalesController extends MyController
 {
     /**
      * @inheritdoc
@@ -180,14 +182,72 @@ class SalesController extends Controller
 
         $model = $this->findModel($id);
         $code = $this->generateSuratJalanCode();
-        if ($model) {
-            $this->layout = 'empty';
 
-            return $this->render('report', [
-                'model' => $model,
-                'code' => $code
-            ]);
+        $content = "";
+        $arrPrintCopy = Yii::$app->params['print_copy'];
+        foreach ($arrPrintCopy as $item) {
+            if ($content == "") {
+                $content = $this->renderPartial('report', [
+                    'model' => $model,
+                    'code' => $code,
+                    'item' => $item
+                ]); 
+            }else {
+                $pageBreak = '<div class="page-break"></div>';
+                $content = $content . $pageBreak. $this->renderPartial('report', [
+                    'model' => $model,
+                    'code' => $code,
+                    'item' => $item
+                ]); 
+            }
+              
         }
+        // setup kartik\mpdf\Pdf component
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_CORE, 
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4, 
+            'marginTop' => 5,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT, 
+            // stream to browser inline
+            'destination' => Pdf::DEST_BROWSER, 
+            // your html content input
+            'content' => $content,  
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting 
+            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            // any css to be embedded if required
+            // 'cssInline' => '.kv-heading-1{font-size:18px}', 
+            'cssInline' => '
+                .kv-heading-1{font-size:18px}
+                @media all {
+                    .page-break	{ display: none; }
+                }
+                @media print {
+                    .page-break	{ display: block; page-break-before: always; }
+                }
+            ',
+            // set mPDF properties on the fly
+            'options' => ['title' => 'Krajee Report Title'],
+            // call mPDF methods on the fly
+            // 'methods' => [ 
+            //     'SetHeader'=>['Krajee Report Header'], 
+            //     'SetFooter'=>['{PAGENO}'],
+            // ]
+        ]);
+        
+        // return the pdf output as per the destination setting
+        return $pdf->render(); 
+        // if ($model) {
+        //     $this->layout = 'empty';
+
+        //     return $this->render('report', [
+        //         'model' => $model,
+        //         'code' => $code
+        //     ]);
+        // }
     }
 
     public function actionSuratJalan($id)

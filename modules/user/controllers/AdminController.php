@@ -5,6 +5,7 @@ namespace app\modules\user\controllers;
 use Yii;
 use amnah\yii2\user\models\User;
 use yii\web\Controller;
+use app\components\MyController;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -14,7 +15,7 @@ use yii\widgets\ActiveForm;
 /**
  * AdminController implements the CRUD actions for User model.
  */
-class AdminController extends Controller
+class AdminController extends MyController
 {
     /**
      * @var \amnah\yii2\user\Module
@@ -29,9 +30,9 @@ class AdminController extends Controller
     {
         // check for admin permission (`tbl_role.can_admin`)
         // note: check for Yii::$app->user first because it doesn't exist in console commands (throws exception)
-        if (!empty(Yii::$app->user) && !Yii::$app->user->can("admin")) {
-            throw new ForbiddenHttpException('You are not allowed to perform this action.');
-        }
+        // if (!empty(Yii::$app->user)) {
+        //     throw new ForbiddenHttpException('You are not allowed to perform this action.');
+        // }
 
         parent::init();
     }

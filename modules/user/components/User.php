@@ -1,7 +1,12 @@
 <?php
+
 namespace app\modules\user\components;
 
 use Yii;
+use app\models\AuthMaster;
+use app\models\RoleAuth;
+use app\modules\user\models\User as UserModel;
+use yii\helpers\Inflector;
 
 /**
  * User component
@@ -11,7 +16,7 @@ class User extends \yii\web\User
     /**
      * @inheritdoc
      */
-    public $identityClass = 'app\modules\user\models';
+    public $identityClass = 'app\modules\user\models\User';
 
     /**
      * @inheritdoc
@@ -28,8 +33,7 @@ class User extends \yii\web\User
      */
     public function getIsGuest()
     {
-        /** @var \app\modules\user\modelsSabuta2022!
-         * \User $user */
+        /** @var \amnah\yii2\user\models\User $user */
 
         // check if user is banned. if so, log user out and redirect home
         // https://github.com/amnah/yii2-user/issues/99
@@ -93,5 +97,69 @@ class User extends \yii\web\User
         /** @var \amnah\yii2\user\models\User $user */
         $user = $this->getIdentity();
         return $user ? $user->can($permissionName) : false;
+    }
+
+    public function getRole() {
+        $user = UserModel::find()->joinWith(['role'])
+            ->where([
+                'user.id' => Yii::$app->user->id
+            ])->one();
+        if ($user) {
+            $roleName = Inflector::camel2id(str_replace(" ", "", $user->role->name));
+            return $roleName;
+        }else {
+            return null;
+        }
+    }
+    public function getRedirect() {
+        $user = UserModel::find()->joinWith(['role'])
+            ->where([
+                'user.id' => Yii::$app->user->id
+            ])->one();
+        if ($user) {
+            return $user->role->redirect_path;
+        }else {
+            return null;
+        }
+    }
+
+    public function canAccess($path) {
+        $arrPath = explode("/", $path);
+        if (sizeof($arrPath) == 3) {
+            $moduleID = $arrPath[0];
+            $controllerID = $arrPath[1];
+            $actionID = $arrPath[2];
+            $authMaster = AuthMaster::find()
+                ->where([
+                    'module' => $moduleID,
+                    'controller' => $controllerID,
+                    'action' => $actionID  
+                ])->one();
+        }else {
+            $controllerID = $arrPath[0];
+            $actionID = $arrPath[1];
+            $authMaster = AuthMaster::find()
+                ->where([
+                    'controller' => $controllerID,
+                    'action' => $actionID  
+                ])->one();
+        }
+        $userID = \Yii::$app->user->id;
+        
+        $user = UserModel::find()
+            ->where([
+                'id' => $userID
+            ])->one();
+        $userRole = RoleAuth::find()
+            ->where([
+                'role_id' => $user->role_id,
+                'auth_id' => $authMaster->id
+            ])->one();
+                
+        if ($userRole) {
+            return true;
+        }else {
+            return false;
+        }
     }
 }

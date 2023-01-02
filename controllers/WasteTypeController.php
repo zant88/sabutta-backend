@@ -8,11 +8,12 @@ use app\models\WasteTypeSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * WasteTypeController implements the CRUD actions for WasteType model.
  */
-class WasteTypeController extends Controller
+class WasteTypeController extends MyController
 {
     /**
      * @inheritdoc
