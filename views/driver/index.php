@@ -7,6 +7,7 @@ use yii\widgets\Pjax;
 
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
+    'iddriver',
     'nama',
     'nmperusahaan',
     'telppersh',

@@ -24,7 +24,7 @@ $gridColumns = [
     // 'pkp',
     // 'nodomisilipersh',
     // 'notandapersh',
-    // 'userid',
+    'userid',
     // 'pass',
     'namafas',
     // 'ttdmanagement',
