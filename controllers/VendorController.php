@@ -8,11 +8,12 @@ use app\models\VendorSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * VendorController implements the CRUD actions for Vendor model.
  */
-class VendorController extends Controller
+class VendorController extends MyController
 {
     /**
      * @inheritdoc

@@ -10,11 +10,12 @@ use app\models\Mrole;
 use app\models\VendorWaste;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * JenissampahController implements the CRUD actions for Jenissampah model.
  */
-class JenissampahController extends Controller
+class JenissampahController extends MyController
 {
     /**
      * @inheritdoc

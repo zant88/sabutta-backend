@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'sabutta',
+    'timeZone' => 'Asia/Jakarta',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -33,9 +34,9 @@ $config = [
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
+        // 'errorHandler' => [
+        //     'errorAction' => 'site/error',
+        // ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             // send all mails to a file by default. You have to set

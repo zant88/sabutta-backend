@@ -15,12 +15,20 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('user', 'Users'), 'url' => [
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-create">
-
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <?= $this->render('_form', [
-        'user' => $user,
-        'profile' => $profile,
-    ]) ?>
-
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h4><?= Html::encode($this->title) ?></h4>
+        </div>
+        <div class="card-body">
+          <?= $this->render('_form', [
+              'user' => $user,
+              'profile' => $profile,
+          ]) ?>
+        </div>
+    </div>
+    </div>
+  </div>
+  
 </div>

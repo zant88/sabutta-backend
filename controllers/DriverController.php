@@ -10,11 +10,12 @@ use app\models\Mrole;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * DriverController implements the CRUD actions for Driver model.
  */
-class DriverController extends Controller
+class DriverController extends MyController
 {
     /**
      * @inheritdoc

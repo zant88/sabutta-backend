@@ -10,11 +10,12 @@ use app\models\Sales;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * InvoiceController implements the CRUD actions for Invoice model.
  */
-class InvoiceController extends Controller
+class InvoiceController extends MyController
 {
     /**
      * @inheritdoc
@@ -126,7 +127,7 @@ class InvoiceController extends Controller
                         $transaction->rollback();
                     }
                 }
-            }catch (Exception $e) {
+            }catch (\Exception $e) {
                 $transaction->rollback();
             }
         } else {

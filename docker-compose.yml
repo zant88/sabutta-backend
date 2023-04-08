@@ -2,21 +2,21 @@ version: '2'
 services:
   php:
     # image: yiisoftware/yii2-php:7.4-apache
-    container_name: sabutta_api-php
+    container_name: indev_sabutta_api-php
     image: yiisoftware/yii2-php:8.0-apache
     ports:
-      - '8083:80'
+      - '6083:80'
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
     networks:
-      - sabutta_prod
+      - sabutta_indev
 
   db:
-    container_name: sabutta_api-dbnew
+    container_name: indev_sabutta_api-dbnew
     image: mysql:5.5
     networks:
-      - sabutta_prod
+      - sabutta_indev
     environment:
       MYSQL_DATABASE: pupr
       # So you don't have to use root, but you can if you like
@@ -27,10 +27,10 @@ services:
       MYSQL_ROOT_PASSWORD: Fasyankes!@#
     ports:
       # <Port exposed> : < MySQL Port running inside container>
-      - '4306:3306'
+      - '2306:3306'
     expose:
       # Opens port 3306 on the container
-      - '4306'
+      - '2306'
       # Where our data will be persisted
     volumes:
       - my-db:/var/lib/mysql
@@ -61,47 +61,47 @@ services:
 #       - /home/sabuta/sabutta-backend/db:/etc/mysql
   
   api-service:
-    container_name: sabutta_api-service
-    image: sabutta_api-service
+    container_name: indev_sabutta_api-service
+    image: indev_sabutta_api-service
     build:
       context: ./java
     depends_on:
       - db
     ports:
-      - "8090:8090"
+      - "6090:8090"
     networks:
-      - sabutta_prod
+      - sabutta_indev
   
   proxy-service:
-    container_name: sabutta_proxy-service
-    image: sabutta_proxy-service
+    container_name: indev_sabutta_proxy-service
+    image: indev_sabutta_proxy-service
     build:
       context: ./java/proxy
     depends_on:
       - db
     ports:
-      - "9999:8091"
+      - "7999:8091"
     networks:
-      - sabutta_prod
+      - sabutta_indev
 
   web-app:
-    container_name: sabutta_api-web-app
-    image: sabutta_api-web-app
+    container_name: indev_sabutta_api-web-app
+    image: indev_sabutta_api-web-app
     build:
       context: ./web-app
       dockerfile: Dockerfile
     ports:
-      - "8085:80"
+      - "6085:80"
   
   phpmyadmin:
-    container_name: sabutta_api-phpmyadmin
+    container_name: indev_sabutta_api-phpmyadmin
     image: phpmyadmin/phpmyadmin
     links: 
       - db:db
     ports:
-      - 8084:80
+      - 6084:80
     networks:
-      - sabutta_prod
+      - sabutta_indev
     environment:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
@@ -110,8 +110,7 @@ services:
 
 
 networks: 
-  sabutta_prod:
+  sabutta_indev:
 
 volumes:
   my-db:
-    external: true

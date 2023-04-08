@@ -10,6 +10,7 @@ use yii\db\ActiveRecord;
  *
  * @property integer $id
  * @property string $name
+ * @property string $redirect_path
  * @property string $created_at
  * @property string $updated_at
  * @property integer $can_admin
@@ -29,7 +30,7 @@ class Role extends ActiveRecord
     const ROLE_USER = 2;
 
     /**
-     * @var \amnah\yii2\user\Module
+     * @var \app\modules\user\Module
      */
     public $module;
 
@@ -44,13 +45,21 @@ class Role extends ActiveRecord
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public static function tableName()
+    {
+        return 'role';
+    }
+
+    /**
      * @inheritdoc
      */
     public function rules()
     {
         $rules = [
             [['name'], 'required'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'redirect_path'], 'string', 'max' => 255],
             [['can_admin'], 'integer'],
         ];
 
@@ -76,6 +85,7 @@ class Role extends ActiveRecord
             'created_at' => Yii::t('user', 'Created At'),
             'updated_at' => Yii::t('user', 'Updated At'),
             'can_admin' => Yii::t('user', 'Can Admin'),
+            'redirect_path' => Yii::t('user', 'Redirect Path'),
         ];
     }
 

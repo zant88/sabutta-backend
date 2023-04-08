@@ -8,11 +8,11 @@ use app\models\FasyankesUserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
-
+use app\components\MyController;
 /**
  * FasyankesUserController implements the CRUD actions for FasyankesUser model.
  */
-class FasyankesUserController extends Controller
+class FasyankesUserController extends MyController
 {
     /**
      * @inheritdoc

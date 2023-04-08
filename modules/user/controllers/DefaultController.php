@@ -4,6 +4,7 @@ namespace app\modules\user\controllers;
 
 use Yii;
 use yii\web\Controller;
+use app\components\MyController;
 use yii\web\Response;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -12,7 +13,7 @@ use yii\widgets\ActiveForm;
 /**
  * Default controller for User module
  */
-class DefaultController extends Controller
+class DefaultController extends MyController
 {
     /**
      * @var \amnah\yii2\user\Module
@@ -26,26 +27,26 @@ class DefaultController extends Controller
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                'rules' => [
-                    [
-                        'actions' => ['index', 'confirm', 'resend', 'logout'],
-                        'allow' => true,
-                        'roles' => ['?', '@'],
-                    ],
-                    [
-                        'actions' => ['account', 'profile', 'resend-change', 'cancel'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'actions' => ['login', 'register', 'forgot', 'reset', 'login-email', 'login-callback'],
-                        'allow' => true,
-                        'roles' => ['?'],
-                    ],
-                ],
-            ],
+            // 'access' => [
+            //     'class' => AccessControl::className(),
+            //     'rules' => [
+            //         [
+            //             'actions' => ['index', 'confirm', 'resend', 'logout'],
+            //             'allow' => true,
+            //             'roles' => ['?', '@'],
+            //         ],
+            //         [
+            //             'actions' => ['account', 'profile', 'resend-change', 'cancel'],
+            //             'allow' => true,
+            //             'roles' => ['@'],
+            //         ],
+            //         [
+            //             'actions' => ['login', 'register', 'forgot', 'reset', 'login-email', 'login-callback'],
+            //             'allow' => true,
+            //             'roles' => ['?'],
+            //         ],
+            //     ],
+            // ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

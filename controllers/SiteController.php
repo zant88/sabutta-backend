@@ -9,9 +9,9 @@ use yii\web\Response;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\components\MyController;
 
-
-class SiteController extends Controller
+class SiteController extends MyController
 {
     /**
      * {@inheritdoc}
@@ -53,6 +53,18 @@ class SiteController extends Controller
                 'fixedVerifyCode' => YII_ENV_TEST ? 'testme' : null,
             ],
         ];
+    }
+
+    public function beforeAction( $action ) {
+        if ( parent::beforeAction ( $action ) ) {
+             //change layout for error action after 
+             //checking for the error action name 
+             //so that the layout is set for errors only
+            if ( $action->id == 'error' ) {
+                $this->layout = 'exception';
+            }
+            return true;
+        } 
     }
 
     /**

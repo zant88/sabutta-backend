@@ -67,7 +67,6 @@ $('#vendor_id').on('change', function(e){
         type: 'GET',
         url: `/invoice/get-sj-by-vendor/?vendor_id=\${vendor_id}`,
         success: function(data){
-            console.log(data);
             $('#surat-jalan *').remove();
             data.data.forEach(item => {
                 $('#surat-jalan').append('<option value="'+item.id+'">'+item.code+'</option>');
