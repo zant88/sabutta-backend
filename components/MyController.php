@@ -10,11 +10,12 @@ use yii\web\HttpException;
 class MyController extends \yii\web\Controller
 {
     public function beforeAction($action){
+        $module_id = Yii::$app->controller->module->id;
+        $controller_id = Yii::$app->controller->id;
+        $action_id = Yii::$app->controller->action->id;
+            
         if (!Yii::$app->user->isGuest) {
             $user_id = \Yii::$app->user->id;
-            $module_id = Yii::$app->controller->module->id;
-            $controller_id = Yii::$app->controller->id;
-            $action_id = Yii::$app->controller->action->id;
             if ($action_id != 'error') {
                 if ($module_id == Yii::$app->id) {
                     $auth_master = AuthMaster::find()
@@ -53,13 +54,12 @@ class MyController extends \yii\web\Controller
                     throw new HttpException(403, 'You are not allowed to perform this action.');
                 }
             }
-
-            // echo 'test';
-            // echo $action_id;
-            // die;
-            
+        }else {
+            if ($module_id != 'user' && $controller_id != 'login') {
+                $this->redirect(['/user/login']);
+                return parent::beforeAction($action);
+            }   
         }
-        
             
         return parent::beforeAction($action);
     }
