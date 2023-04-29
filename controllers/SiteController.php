@@ -19,17 +19,6 @@ class SiteController extends MyController
     public function behaviors()
     {
         return [
-            'access' => [
-                'class' => AccessControl::className(),
-                // 'only' => ['login'],
-                'rules' => [
-                    [
-                        'actions' => ['index', 'contact', 'about', 'get-total-user', 'get-total-sales'],
-                        'allow' => true,
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
@@ -106,6 +95,54 @@ class SiteController extends MyController
         $out = [
             'success' => true,
             'data' => $totalSales
+        ];
+
+        return $out;
+    }
+
+    /**
+     * get Today Weight
+     */
+    public function actionGetTodayWeight() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $date = date('Y-m-d');
+        $query = (new \yii\db\Query())->from('order')
+            ->where("DATE(tanggalinput)='$date'");
+        $weightTotal = $query->sum('berat');
+        if (!$weightTotal) {
+            $weightTotal = 0;
+        }
+        $out = [
+            'success' => true,
+            'data' => $weightTotal
+        ];
+
+        return $out;
+    }
+
+    /**
+     * get Today Weight
+     */
+    public function actionGetThisMonthWeight() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $month = date('n');
+        $query = (new \yii\db\Query())->from('order')
+            ->where("MONTH(tanggalinput)='$month'");
+        $weightTotal = $query->sum('berat');
+        if (!$weightTotal) {
+            $weightTotal = 0;
+        }
+        $out = [
+            'success' => true,
+            'data' => $weightTotal
         ];
 
         return $out;
