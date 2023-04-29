@@ -124,42 +124,47 @@ class User extends \yii\web\User
     }
 
     public function canAccess($path) {
-        $arrPath = explode("/", $path);
-        if (sizeof($arrPath) == 3) {
-            $moduleID = $arrPath[0];
-            $controllerID = $arrPath[1];
-            $actionID = $arrPath[2];
-            $authMaster = AuthMaster::find()
+        if (!Yii::$app->user->isGuest) {
+            $arrPath = explode("/", $path);
+            if (sizeof($arrPath) == 3) {
+                $moduleID = $arrPath[0];
+                $controllerID = $arrPath[1];
+                $actionID = $arrPath[2];
+                $authMaster = AuthMaster::find()
+                    ->where([
+                        'module' => $moduleID,
+                        'controller' => $controllerID,
+                        'action' => $actionID  
+                    ])->one();
+            }else {
+                $controllerID = $arrPath[0];
+                $actionID = $arrPath[1];
+                $authMaster = AuthMaster::find()
+                    ->where([
+                        'controller' => $controllerID,
+                        'action' => $actionID  
+                    ])->one();
+            }
+            $userID = \Yii::$app->user->id;
+            
+            $user = UserModel::find()
                 ->where([
-                    'module' => $moduleID,
-                    'controller' => $controllerID,
-                    'action' => $actionID  
+                    'id' => $userID
                 ])->one();
-        }else {
-            $controllerID = $arrPath[0];
-            $actionID = $arrPath[1];
-            $authMaster = AuthMaster::find()
+            $userRole = RoleAuth::find()
                 ->where([
-                    'controller' => $controllerID,
-                    'action' => $actionID  
+                    'role_id' => $user->role_id,
+                    'auth_id' => $authMaster->id
                 ])->one();
-        }
-        $userID = \Yii::$app->user->id;
-        
-        $user = UserModel::find()
-            ->where([
-                'id' => $userID
-            ])->one();
-        $userRole = RoleAuth::find()
-            ->where([
-                'role_id' => $user->role_id,
-                'auth_id' => $authMaster->id
-            ])->one();
-                
-        if ($userRole) {
-            return true;
+                    
+            if ($userRole) {
+                return true;
+            }else {
+                return false;
+            }
         }else {
             return false;
         }
+        
     }
 }
