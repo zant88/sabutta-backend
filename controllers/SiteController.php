@@ -124,6 +124,77 @@ class SiteController extends MyController
         return $out;
     }
 
+    private function countObjectLength($arrObj) {
+        $ret = 0;
+        foreach ($arrObj as $key => &$value) {
+            $ret = strlen($key);
+        }
+        
+        return $ret;
+    }
+
+    /**
+     * get Today Transaction Fee
+     */
+    public function actionGetTodayTransactionFee() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $todayTrxFee = 0;
+        $date = date('Y-m-d');
+        $query = (new \yii\db\Query())->from('apps')
+            ->where("idapps='trx.fee'")->one();
+        if ($this->countObjectLength($query) > 0) {
+            $query2 = (new \yii\db\Query())->from('order')
+                ->where("DATE(tanggalinput)='$date'");
+            $weightTotal = $query2->sum('berat');
+            if (!$weightTotal) {
+                $weightTotal = 0;
+            }
+            $todayTrxFee = $weightTotal * $query['value'];
+
+            $out = [
+                'success' => true,
+                'data' => $todayTrxFee
+            ];
+        }
+        
+        return $out;
+    }
+
+    /**
+     * get This month Transaction Fee
+     */
+    public function actionGetThisMonthTransactionFee() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $todayTrxFee = 0;
+        $month = date('n');
+        $query = (new \yii\db\Query())->from('apps')
+            ->where("idapps='trx.fee'")->one();
+        if ($this->countObjectLength($query) > 0) {
+            $query2 = (new \yii\db\Query())->from('order')
+                ->where("MONTH(tanggalinput)='$month'");
+            $weightTotal = $query2->sum('berat');
+            if (!$weightTotal) {
+                $weightTotal = 0;
+            }
+            $todayTrxFee = $weightTotal * $query['value'];
+
+            $out = [
+                'success' => true,
+                'data' => $todayTrxFee
+            ];
+        }
+        
+        return $out;
+    }
+
     /**
      * get Today Weight
      */

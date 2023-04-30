@@ -29,16 +29,16 @@ class StockController extends MyController
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'card', 'view', 'create', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
+            // 'access' => [
+            //     'class' => \yii\filters\AccessControl::class,
+            //     'rules' => [
+            //         [
+            //             'allow' => true,
+            //             'actions' => ['index', 'card', 'view', 'create', 'update', 'delete'],
+            //             'roles' => ['@'],
+            //         ],
+            //     ],
+            // ],
         ];
     }
 
