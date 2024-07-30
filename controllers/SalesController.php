@@ -11,12 +11,15 @@ use app\models\Vendor;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\data\ActiveDataProvider;
 use yii\db\Query;
+use app\components\MyController;
+use kartik\mpdf\Pdf;
 
 /**
  * SalesController implements the CRUD actions for Sales model.
  */
-class SalesController extends Controller
+class SalesController extends MyController
 {
     /**
      * @inheritdoc
@@ -30,6 +33,16 @@ class SalesController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            // 'access' => [
+            //     'class' => \yii\filters\AccessControl::class,
+            //     'rules' => [
+            //         [
+            //             'allow' => true,
+            //             'actions' => ['index', 'view', 'create', 'submit-sales', 'print-surat-jalan', 'invoice', 'update', 'delete', 'surat-jalan'],
+            //             'roles' => ['@'],
+            //         ],
+            //     ],
+            // ],
         ];
     }
 
@@ -55,8 +68,12 @@ class SalesController extends Controller
      */
     public function actionView($id)
     {
+        $dataProvider = new ActiveDataProvider([
+            'query' => SalesDetail::find()->where(['sales_id' => $id]),
+        ]);
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'dataProvider' => $dataProvider,
         ]);
     }
 
@@ -79,10 +96,57 @@ class SalesController extends Controller
         }
     }
 
+    /**
+     * Generate code for sales code
+     * 
+     */
+
+    private function generateSalesCode() {
+        $currDate = date('Y-m-d');
+        $sales = Sales::find()->where([
+            'DATE(sales_date)' => $currDate
+        ])->orderBy('sales_date DESC')->one();
+        $prevIndex = 0;
+        if ($sales) {
+            $prevIndex = (int) substr($sales->code, 8);
+        }
+        $newIndex = $prevIndex + 1;
+        $code = "SO" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
+        
+        return $code;
+    }
+
+    public function actionOrderList($q) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["idorder as id", "CONCAT(idorder, ' - ', status, ' - ', tanggalinput) as text"], )
+            ->from('order')
+            ->where("idorder LIKE '%".$q."%'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        return $out;
+    }
+
+    public function actionOrderDetail($id) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["*"], )
+            ->from('orderdetail')
+            ->join('LEFT JOIN', 'jenissampah', 'orderdetail.idsampah=jenissampah.idsampah')
+            ->where("orderid='".$id."'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        return $out;
+    }
+
     public function actionSubmitSales()
     {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        // eg. SO00001
+        // eg. SO00001 SO1104220001
         $out = [
             'success' => false,
         ];
@@ -96,17 +160,10 @@ class SalesController extends Controller
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
             try {
-                $sales = Sales::find()->orderBy('sales_date DESC')->one();
-                $prevIndex = 0;
-                if ($sales) {
-                    $prevIndex = (int) substr($sales->code, 2);
-                }
-                $newIndex = $prevIndex + 1;
-                $code = "SO" . str_pad($newIndex, 5, '0', STR_PAD_LEFT);
                 $sales = new Sales();
                 $sales->vendor_id = $_POST['vendor_id'];
-                $sales->code = $code;
-                $sales->sales_date = $_POST['sales_date']. ' ' . date('H:i:s');
+                $sales->code = $this->generateSalesCode();
+                $sales->sales_date = $_POST['sales_date'] . ' ' . date('H:i:s');
                 $sales->total = $_POST['total'];
                 if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
@@ -117,30 +174,162 @@ class SalesController extends Controller
                         $salesDetail->amount_kg = $item->weight;
                         $salesDetail->total_price = $item->weight * $item->harga;
                         if ($salesDetail->validate()) {
-                            $salesDetail->save();
-                            $stock = new Stock();
-                            $stock->idstock = (string) round(microtime(true) * 1000);
-                            $stock->idjnssampah = $item->id;
-                            $stock->nilai = $item->weight;
-                            $stock->jnsstock = 'OUT';
-                            $stock->tgl = $_POST['sales_date'];
-                            if ($stock->validate()) {
-                                $stock->save();
-                                $transaction->commit();
-                                $out = [
-                                    'success' => true,
-                                ];
+                            if ($salesDetail->save()) {
+                                $stock = new Stock();
+                                $stock->idstock = (string) round(microtime(true) * 1000);
+                                $stock->idjnssampah = $item->id;
+                                $stock->nilai = $item->weight;
+                                $stock->jnsstock = 'OUT';
+                                $stock->tgl = $_POST['sales_date'];
+                                if ($stock->validate()) {
+                                    $stock->save();
+                                    $out = [
+                                        'success' => true,
+                                        'id' => $sales->id,
+                                    ];
+                                }
                             }
                         }
                     }
+                    $transaction->commit();     
                 }
-                
             } catch (\Exception $e) {
                 $transaction->rollback();
             }
         }
 
         return $out;
+    }
+
+    /**
+     * Letter to print
+     */
+    public function actionPrintSuratJalan($id)
+    {
+
+        $model = $this->findModel($id);
+        $code = $this->generateSuratJalanCode();
+
+        $content = "";
+        $arrPrintCopy = Yii::$app->params['print_copy'];
+        foreach ($arrPrintCopy as $item) {
+            if ($content == "") {
+                $content = $this->renderPartial('report', [
+                    'model' => $model,
+                    'code' => $code,
+                    'item' => $item
+                ]); 
+            }else {
+                $pageBreak = '<div class="page-break"></div>';
+                $content = $content . $pageBreak. $this->renderPartial('report', [
+                    'model' => $model,
+                    'code' => $code,
+                    'item' => $item
+                ]); 
+            }
+              
+        }
+        // setup kartik\mpdf\Pdf component
+        $pdf = new Pdf([
+            // set to use core fonts only
+            'mode' => Pdf::MODE_CORE, 
+            // A4 paper format
+            'format' => Pdf::FORMAT_A4, 
+            'marginTop' => 5,
+            // portrait orientation
+            'orientation' => Pdf::ORIENT_PORTRAIT, 
+            // stream to browser inline
+            'destination' => Pdf::DEST_BROWSER, 
+            // your html content input
+            'content' => $content,  
+            // format content from your own css file if needed or use the
+            // enhanced bootstrap css built by Krajee for mPDF formatting 
+            'cssFile' => '@vendor/kartik-v/yii2-mpdf/src/assets/kv-mpdf-bootstrap.min.css',
+            // any css to be embedded if required
+            // 'cssInline' => '.kv-heading-1{font-size:18px}', 
+            'cssInline' => '
+                .kv-heading-1{font-size:18px}
+                @media all {
+                    .page-break	{ display: none; }
+                }
+                @media print {
+                    .page-break	{ display: block; page-break-before: always; }
+                }
+            ',
+            // set mPDF properties on the fly
+            'options' => ['title' => 'Krajee Report Title'],
+            // call mPDF methods on the fly
+            // 'methods' => [ 
+            //     'SetHeader'=>['Krajee Report Header'], 
+            //     'SetFooter'=>['{PAGENO}'],
+            // ]
+        ]);
+        
+        // return the pdf output as per the destination setting
+        return $pdf->render(); 
+        // if ($model) {
+        //     $this->layout = 'empty';
+
+        //     return $this->render('report', [
+        //         'model' => $model,
+        //         'code' => $code
+        //     ]);
+        // }
+    }
+
+    public function actionSuratJalan($id)
+    {
+        $model = $this->findModel($id);
+        if ($model) {
+            if ($model->load(Yii::$app->request->post())) {
+                $model->generated_date_surat_jalan = $model->sales_date;
+                if (!$model->surat_jalan_code) {
+                    $model->surat_jalan_code = $this->generateSuratJalanCode();
+                }
+                if ($model->save()) {
+                    return $this->redirect(['print-surat-jalan', 'id' => $model->id]);
+                }
+            }
+
+            return $this->render('surat-jalan', [
+                'model' => $model,
+            ]);
+        } else {
+            // return $this->redirect(['index']);
+        }
+    }
+
+    private function generateSuratJalanCode()
+    {
+        $currMonth = date('n');
+        $currYear = date('Y');
+        $strWhere = "MONTH(sales_date) = '$currMonth' AND YEAR(sales_date) = '$currYear' 
+        AND surat_jalan_code IS NOT null";
+        $sales = Sales::find()->where($strWhere)->orderBy('sales_date DESC')->one();
+        $prevIndex = 0;
+        if ($sales) {
+            $prevIndex = (int) substr($sales->surat_jalan_code, 0, 3);
+        }
+        $newIndex = $prevIndex + 1;
+
+        $code = str_pad($newIndex, 3, '0', STR_PAD_LEFT) . "/" . date('m') . "/ETS/" . date('Y');
+        return $code;
+    }
+
+    /**
+     * Letter to print
+     */
+    public function actionInvoice($id)
+    {
+
+        $model = $this->findModel($id);
+        if ($model) {
+            $this->layout = 'empty';
+
+            return $this->render('invoice', [
+                'model' => $model,
+            ]);
+        }
     }
 
     /**

@@ -72,6 +72,8 @@ class DriverSearch extends Driver
             ->andFilterWhere(['like', 'tokenfb', $this->tokenfb])
             ->andFilterWhere(['like', 'role', $this->role]);
 
+        $query->orderBy('iddriver');
+
         return $dataProvider;
     }
 }

@@ -56,6 +56,7 @@ class SalesSearch extends Sales
             // $query->where('0=1');
             return $dataProvider;
         }
+        $query->orderBy('sales_date DESC');
 
         // grid filtering conditions
         $query->andFilterWhere([

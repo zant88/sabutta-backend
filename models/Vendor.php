@@ -11,8 +11,11 @@ use Yii;
  * @property string|null $name
  * @property string|null $address
  * @property string|null $description
- * @property string|null $phone
  * @property int|null $status
+ * @property string|null $phone
+ *
+ * @property Sales[] $sales
+ * @property VendorWaste[] $vendorWastes
  */
 class Vendor extends \yii\db\ActiveRecord
 {
@@ -30,9 +33,10 @@ class Vendor extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['address', 'description', 'phone'], 'string'],
+            [['address', 'description'], 'string'],
             [['status'], 'integer'],
             [['name'], 'string', 'max' => 255],
+            [['phone'], 'string', 'max' => 35],
         ];
     }
 
@@ -47,7 +51,27 @@ class Vendor extends \yii\db\ActiveRecord
             'address' => Yii::t('app', 'Address'),
             'description' => Yii::t('app', 'Description'),
             'status' => Yii::t('app', 'Status'),
-            'phone' => Yii::t('app', 'No. Tlp'),
+            'phone' => Yii::t('app', 'Phone'),
         ];
+    }
+
+    /**
+     * Gets query for [[Sales]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSales()
+    {
+        return $this->hasMany(Sales::className(), ['vendor_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[VendorWastes]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVendorWastes()
+    {
+        return $this->hasMany(VendorWaste::className(), ['vendor_id' => 'id']);
     }
 }

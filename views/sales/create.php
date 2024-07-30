@@ -174,6 +174,7 @@ $this->registerJsFile(
   '@web/js/views/sales.js',
   ['depends' => [\yii\web\JqueryAsset::class]]
 );
+
 $this->registerJsFile(
   'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
   ['depends' => [\yii\web\JqueryAsset::class]]

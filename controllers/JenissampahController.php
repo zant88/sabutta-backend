@@ -8,13 +8,17 @@ use app\models\JenissampahSearch;
 use yii\web\Controller;
 use app\models\Mrole;
 use app\models\VendorWaste;
+use app\models\ProdukUser;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
+use stdClass;
+use yii\db\Query;
 
 /**
  * JenissampahController implements the CRUD actions for Jenissampah model.
  */
-class JenissampahController extends Controller
+class JenissampahController extends MyController
 {
     /**
      * @inheritdoc
@@ -52,20 +56,22 @@ class JenissampahController extends Controller
      */
     public function actionView($id)
     {
-        
+
         return $this->render('view', [
             'model' => $this->findModel($id)
         ]);
     }
 
-    public function actionGetVendorWaste($idsampah) {
+    public function actionGetVendorWaste($idsampah)
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = [];
         $vendorWaste = VendorWaste::find()->where([
-            'idsampah' => $idsampah])->all();
+            'idsampah' => $idsampah
+        ])->all();
         foreach ($vendorWaste as $vendor) {
             $out[] = [
-                'vendor_id' => $vendor->vendor_id, 
+                'vendor_id' => $vendor->vendor_id,
                 'name' => $vendor->vendor->name,
                 'price_kg' => $vendor->price_kg
             ];
@@ -73,9 +79,23 @@ class JenissampahController extends Controller
         return $out;
     }
 
-    public function actionSaveData() {
+    public function actionWasteList() {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-        
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["idsampah", "nama"], )
+            ->from('jenissampah');
+            // ->where("idorder LIKE '%".$q."%'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        return $out;
+    }
+
+    public function actionSaveData()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
         $out = [
             'success' => false,
             'message' => 'No Valid Data'
@@ -83,17 +103,20 @@ class JenissampahController extends Controller
         if (isset($_POST['idsampah']) && isset($_POST['items'])) {
             $arrData = json_decode($_POST['items']);
             foreach ($arrData as $item) {
-                $model = VendorWaste::find()->where([
-                    'vendor_id' => $item->id,
-                    'idsampah' => $_POST['idsampah']
-                ])->one();
-                if (!$model) {
-                    $model = new VendorWaste();
+                if (property_exists($item, 'id')) {
+                    $model = VendorWaste::find()->where([
+                        'vendor_id' => $item->id,
+                        'idsampah' => $_POST['idsampah']
+                    ])->one();
+                    if (!$model) {
+                        $model = new VendorWaste();
+                    }
+                    $model->idsampah = $_POST['idsampah'];
+                    $model->vendor_id = $item->id;
+                    $model->price_kg = $item->price;
+                    $model->save();
                 }
-                $model->idsampah = $_POST['idsampah'];
-                $model->vendor_id = $item->id;
-                $model->price_kg = $item->price;
-                $model->save();
+
                 $out['success'] = true;
                 $out['message'] = 'Data Saved';
             }
@@ -112,7 +135,9 @@ class JenissampahController extends Controller
         $model = new Jenissampah();
         $mrole = Mrole::find()->asArray()->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post())) {
+            $model->roleuser = Yii::$app->params['default_role'];
+            $model->save();
             return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
             return $this->render('create', [
@@ -121,7 +146,8 @@ class JenissampahController extends Controller
             ]);
         }
     }
-    public function actionDataSampah() {
+    public function actionDataSampah()
+    {
         echo 'hehe';
         die;
     }
@@ -130,14 +156,15 @@ class JenissampahController extends Controller
      * Get waste based on vendor
      * 
      */
-    public function actionSampahVendor($id) {
+    public function actionSampahVendor($id)
+    {
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = [];
         $model = VendorWaste::find()->where(['vendor_id' => $id])->all();
         foreach ($model as $item) {
             $out[] = [
                 'id' => $item->idsampah,
-                'price' => $item->price_kg, 
+                'price' => $item->price_kg,
                 'waste_name' => $item->waste->nama
             ];
         }
@@ -154,12 +181,63 @@ class JenissampahController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $mrole = Mrole::find()->asArray()->all();
+        $productUser = ProdukUser::find()->where(['idsampah' => $id])->all();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->idsampah]);
+        if ($model->load(Yii::$app->request->post())) {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try {
+                $detRet = true;
+                if (isset($_POST['PriceDetail'])) {
+                    $postData = $_POST['PriceDetail'];
+                    $data = json_decode($model->json);
+                    
+                    $dataArray = json_decode(json_encode($data), true);
+                    $dataArray = $dataArray['vendors'];
+                    $isNew = true;
+                    foreach ($postData as $itemPost) {
+                        foreach ($data->vendors as $i => $item) {
+                            if ($itemPost['id'] == $item->vendorId) {
+                                $isNew = false;
+                                $item->hargaPerKg = $itemPost['price'];
+                                $dataArray[$i]['hargaPerKg'] = $itemPost['price'];
+                            }
+                        }
+                        if ($isNew) {
+                            $obj = new stdClass();
+                            $obj->vendorId = $itemPost['id'];
+                            $obj->hargaPerKg = $itemPost['price'];
+                            $data->vendors[] = $obj;
+                        }
+                    }
+                    
+                    $model->json = json_encode($data);
+                }
+                if ($detRet) {
+                    $model->save();
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                    return $this->redirect(['index']);
+                }else {
+                    $transaction->rollBack();
+                }
+            }catch (\Exception $e) {
+                echo '<pre>';
+                print_r($e->getMessage());
+                die;
+                $transaction->rollback();
+            }
+            
+            // return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
+            // echo '<pre>';
+            // print_r($model->json);
+            // die;
             return $this->render('update', [
                 'model' => $model,
+                'mrole' => $mrole,
+                'produkUser' => $productUser
             ]);
         }
     }
@@ -172,17 +250,15 @@ class JenissampahController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $model = $this->findModel($id);
+            $model->status = "NON AKTIF";
+            $model->save();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

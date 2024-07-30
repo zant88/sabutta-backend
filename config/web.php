@@ -5,6 +5,7 @@ $db = require __DIR__ . '/db.php';
 
 $config = [
     'id' => 'sabutta',
+    'timeZone' => 'Asia/Jakarta',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -16,15 +17,26 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'aNpSGZ_RkJ8HwH8rxjoOYpZ-F4-X2SJg',
         ],
+        // 'assetManager' => [
+        //     'bundles' => [
+        //         'kartik\form\ActiveFormAsset' => [
+        //             'bsDependencyEnabled' => false // do not load bootstrap assets for a specific asset bundle
+        //         ],
+        //     ],
+        // ],
+        // 'user' => [
+        //     'class' => 'amnah\yii2\user\components\User',
+        // ],
         'user' => [
-            'class' => 'amnah\yii2\user\components\User',
+            'class' => 'app\modules\user\components\User',
+            'identityClass' => 'app\modules\user\models\User',
         ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
+        // 'errorHandler' => [
+        //     'errorAction' => 'site/error',
+        // ],
         'mailer' => [
             'class' => 'yii\swiftmailer\Mailer',
             // send all mails to a file by default. You have to set
@@ -50,8 +62,21 @@ $config = [
         ],
     ],
     'modules' => [
+        // 'user' => [
+        //     'class' => 'amnah\yii2\user\Module',
+        //     // set custom module properties here ...
+        // ],
         'user' => [
-            'class' => 'amnah\yii2\user\Module',
+            'class' => 'app\modules\user\Module',
+            'controllerMap' => [
+                // 'default' => 'app\controllers\MyDefaultController',
+                'default' => 'app\modules\user\controllers\DefaultController',
+            ],
+            'modelClasses'  => [
+                'User' => 'app\modules\user\models\User', // note: don't forget component user::identityClass above
+                'Profile' => 'app\modules\user\models\Profile',
+            ],
+            'emailViewPath' => '@app/modules/user/mail',
             // set custom module properties here ...
         ],
         'utility' => [
@@ -59,6 +84,13 @@ $config = [
         ],
         'migration' => [
             'class' => 'bizley\migration\controllers\MigrationController',
+        ],
+        'gridview' => [
+            'class' => 'kartik\grid\Module',
+            // other module settings
+        ],
+        'gallery4' => [
+            'class' => 'zantknight\yii\gallery\Module',
         ],
     ],
     'params' => $params,

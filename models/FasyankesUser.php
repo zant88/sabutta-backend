@@ -79,12 +79,12 @@ class FasyankesUser extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'idfas' => 'Idfas',
+            'idfas' => 'id',
             'alamat' => 'Alamat',
-            'telp' => 'Telp',
+            'telp' => 'HP',
             'fax' => 'Fax',
             'owner' => 'Owner',
-            'namapetugas' => 'Namapetugas',
+            'namapetugas' => 'Nama',
             'jabatanpetugas' => 'Jabatanpetugas',
             'npwp' => 'Npwp',
             'email' => 'Email',
@@ -100,7 +100,7 @@ class FasyankesUser extends \yii\db\ActiveRecord
             'notandapersh' => 'Notandapersh',
             'userid' => 'Userid',
             'pass' => 'Pass',
-            'namafas' => 'Namafas',
+            'namafas' => 'Nama',
             'ttdmanagement' => 'Ttdmanagement',
             'ttdclient' => 'Ttdclient',
             'lat' => 'Lat',
@@ -108,8 +108,8 @@ class FasyankesUser extends \yii\db\ActiveRecord
             'tokenfb' => 'Tokenfb',
             'role' => 'Role',
             'tglinput' => 'Tglinput',
-            'nip' => 'Nip',
-            'nik' => 'Nik',
+            'nip' => 'NIP',
+            'nik' => 'NIK',
             'saldo' => 'Saldo',
         ];
     }

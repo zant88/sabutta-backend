@@ -1,0 +1,1 @@
+docker run --name=proxy2  --network sabutta-backend_sabutta -p 9999:9999 -d fasyankes/proxy

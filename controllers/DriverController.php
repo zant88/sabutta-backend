@@ -4,16 +4,18 @@ namespace app\controllers;
 
 use Yii;
 use app\models\Driver;
+use app\models\Apps;
 use app\models\DriverSearch;
 use app\models\Mrole;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use app\components\MyController;
 
 /**
  * DriverController implements the CRUD actions for Driver model.
  */
-class DriverController extends Controller
+class DriverController extends MyController
 {
     /**
      * @inheritdoc
@@ -25,6 +27,16 @@ class DriverController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => \yii\filters\AccessControl::class,
+                'rules' => [
+                    [
+                        'allow' => true,
+                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
+                        'roles' => ['@'],
+                    ],
                 ],
             ],
         ];
@@ -65,16 +77,33 @@ class DriverController extends Controller
     {
         $model = new Driver();
         $mrole = Mrole::find()->asArray()->all();
-        
+
         if ($model->load(Yii::$app->request->post())) {
-            $model->telppersh = $model->telpdriver;
-            $model->userid = $model->iddriver;
-            $model->pass = md5('enviro');
-            if ($model->validate()) {
-                $model->save();
-                Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+            $apps =  Apps::find()->where([
+                'idapps' => 'idusr.peg' 
+            ])->one();
+            $prefix = '';
+            $currValue = 0;
+            if ($apps) {
+                $prefix = $apps->desc;
+                $currValue = $apps->value;
+                $model->iddriver = $prefix.str_pad($currValue + 1, 3, "0", STR_PAD_LEFT);
+                $model->telppersh = $model->telpdriver;
+                $model->userid = $model->iddriver;
+                $model->pass = md5('enviro');
+                if ($model->validate()) {
+                    $apps->value = (string) ($currValue + 1);
+                    if ($apps->validate()  && $apps->save()) {
+                        $model->save();
+                        Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                        return $this->redirect(['index']);
+                    }
+                }
+            }else {
+                Yii::$app->session->setFlash('error', "Data gagal disimpan! Tidak ada konfigurasi apps");
                 return $this->redirect(['index']);
             }
+            
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -113,17 +142,13 @@ class DriverController extends Controller
      */
     public function actionDelete($id)
     {
-        
-       try
-      {
-        $this->findModel($id)->delete();
-      
-      }
-      catch(\yii\db\IntegrityException  $e)
-      {
-	Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
-       } 
-         return $this->redirect(['index']);
+
+        try {
+            $this->findModel($id)->delete();
+        } catch (\yii\db\IntegrityException  $e) {
+            Yii::$app->session->setFlash('error', "Data Tidak Dapat Dihapus Karena Dipakai Modul Lain");
+        }
+        return $this->redirect(['index']);
     }
 
     /**

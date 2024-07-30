@@ -49,8 +49,23 @@ class Stock extends \yii\db\ActiveRecord
             'idjnssampah' => Yii::t('app', 'Idjnssampah'),
             'nilai' => Yii::t('app', 'Nilai'),
             'tgl' => Yii::t('app', 'Tgl'),
-            'jnsstock' => Yii::t('app', 'Jnsstock'),
+            'jnsstock' => Yii::t('app', 'Masuk / Keluar'),
             'idorder' => Yii::t('app', 'Idorder'),
         ];
+    }
+
+    /**
+     * Gets query for [[SalesDetails]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWaste()
+    {
+        return $this->hasOne(Jenissampah::className(), ['idsampah' => 'idjnssampah']);
+    }
+
+    public function getOrder()
+    {
+        return $this->hasOne(Order::className(), ['idorder' => 'idorder']);
     }
 }
