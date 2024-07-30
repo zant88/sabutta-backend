@@ -5,18 +5,18 @@ use Yii;
 use app\models\AuthMaster;
 use app\modules\user\models\User;
 use app\models\RoleAuth;
+use app\modules\user\models\Role;
 use yii\web\HttpException;
 
 class MyController extends \yii\web\Controller
 {
     public function beforeAction($action){
-        $module_id = Yii::$app->controller->module->id;
-        $controller_id = Yii::$app->controller->id;
-        $action_id = Yii::$app->controller->action->id;
-            
         if (!Yii::$app->user->isGuest) {
             $user_id = \Yii::$app->user->id;
-            if ($action_id != 'error') {
+            $module_id = Yii::$app->controller->module->id;
+            $controller_id = Yii::$app->controller->id;
+            $action_id = Yii::$app->controller->action->id;
+            if ($action_id != 'error' && $action_id != 'term-condition-2' && $action_id != 'term-condition-officer-2') {
                 if ($module_id == Yii::$app->id) {
                     $auth_master = AuthMaster::find()
                         ->where([
@@ -46,18 +46,32 @@ class MyController extends \yii\web\Controller
                             'role_id' => $user->role_id,
                             'auth_id' => $auth_master->id
                         ])->one();
+                    if(!$user_role){
+                        if ($controller_id == 'site' && $action_id == 'index') {
+                            $user = User::findOne($user_id);
+                            $role = Role::findOne($user->role_id);
+                            if ($role->redirect_path) {
+                                
+                            
+                                return $this->redirect([$role->redirect_path]);
+                            }
+                        }else {
+                            throw new HttpException(403, 'You are not allowed to perform this action.');
+                        }
+                        throw new HttpException(403, 'You are not allowed to perform this action.');
+                    }
                 }else {
-                    throw new HttpException(403, 'You are not allowed to perform this action.');
-                }                
-                        
-                if(!$user_role){
-                    throw new HttpException(403, 'You are not allowed to perform this action.');
+                    if ($controller_id == 'site' && $action_id == 'index') {
+                        $user = User::findOne($user_id);
+                        $role = Role::findOne($user->role_id);
+                        if ($role->redirect_path) {
+                            return $this->redirect([$role->redirect_path]);
+                            // return parent::beforeAction($action);
+                        }
+                    }else {
+                        throw new HttpException(403, 'You are not allowed to perform this action.');
+                    }
                 }
-            }
-        }else {
-            if ($module_id != 'user' && $controller_id != 'login') {
-                $this->redirect(['/user/login']);
-                return parent::beforeAction($action);
             }   
         }
             

@@ -8,9 +8,12 @@ use app\models\JenissampahSearch;
 use yii\web\Controller;
 use app\models\Mrole;
 use app\models\VendorWaste;
+use app\models\ProdukUser;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use stdClass;
+use yii\db\Query;
 
 /**
  * JenissampahController implements the CRUD actions for Jenissampah model.
@@ -27,16 +30,6 @@ class JenissampahController extends MyController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                ],
-            ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view', 'get-vendor-waste', 'save-data', 'create', 'sampah-vendor', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
                 ],
             ],
         ];
@@ -83,6 +76,19 @@ class JenissampahController extends MyController
                 'price_kg' => $vendor->price_kg
             ];
         }
+        return $out;
+    }
+
+    public function actionWasteList() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["idsampah", "nama"], )
+            ->from('jenissampah');
+            // ->where("idorder LIKE '%".$q."%'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
         return $out;
     }
 
@@ -176,28 +182,62 @@ class JenissampahController extends MyController
     {
         $model = $this->findModel($id);
         $mrole = Mrole::find()->asArray()->all();
+        $productUser = ProdukUser::find()->where(['idsampah' => $id])->all();
 
         if ($model->load(Yii::$app->request->post())) {
-
-            // keep this comment in case role put in update as well
-            // if (isset($_POST['Jenissampah']['roleuser'])) {
-            //     $strRole = '';
-            //     foreach ($_POST['Jenissampah']['roleuser'] as $item) {
-            //         if ($strRole == '') {
-            //             $strRole = $strRole.$item;
-            //         }else {
-            //             $strRole = $strRole."#".$item;
-            //         }
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try {
+                $detRet = true;
+                if (isset($_POST['PriceDetail'])) {
+                    $postData = $_POST['PriceDetail'];
+                    $data = json_decode($model->json);
                     
-            //     }
-            // }
-            // $model->roleuser = Yii::$app->params['default_role'];
-            $model->save();
-            return $this->redirect(['view', 'id' => $model->idsampah]);
+                    $dataArray = json_decode(json_encode($data), true);
+                    $dataArray = $dataArray['vendors'];
+                    $isNew = true;
+                    foreach ($postData as $itemPost) {
+                        foreach ($data->vendors as $i => $item) {
+                            if ($itemPost['id'] == $item->vendorId) {
+                                $isNew = false;
+                                $item->hargaPerKg = $itemPost['price'];
+                                $dataArray[$i]['hargaPerKg'] = $itemPost['price'];
+                            }
+                        }
+                        if ($isNew) {
+                            $obj = new stdClass();
+                            $obj->vendorId = $itemPost['id'];
+                            $obj->hargaPerKg = $itemPost['price'];
+                            $data->vendors[] = $obj;
+                        }
+                    }
+                    
+                    $model->json = json_encode($data);
+                }
+                if ($detRet) {
+                    $model->save();
+                    $transaction->commit();
+                    Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                    return $this->redirect(['index']);
+                }else {
+                    $transaction->rollBack();
+                }
+            }catch (\Exception $e) {
+                echo '<pre>';
+                print_r($e->getMessage());
+                die;
+                $transaction->rollback();
+            }
+            
+            // return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
+            // echo '<pre>';
+            // print_r($model->json);
+            // die;
             return $this->render('update', [
                 'model' => $model,
-                'mrole' => $mrole
+                'mrole' => $mrole,
+                'produkUser' => $productUser
             ]);
         }
     }

@@ -226,7 +226,25 @@ class SiteController extends MyController
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        if (Yii::$app->user->isGuest) {
+            $this->redirect('user/login');
+        }else {
+            if (!Yii::$app->user->can('admin')) { 
+                $this->redirect(Yii::$app->user->getRedirect());
+            }else {
+                return $this->render('index');
+            }
+        }
+    }
+
+    public function actionTermCondition2() {
+        $this->layout = 'empty';
+        return $this->render('term-condition');
+    }
+
+    public function actionTermConditionOfficer2() {
+        $this->layout = 'empty';
+        return $this->render('term-condition-officer');
     }
 
     /**

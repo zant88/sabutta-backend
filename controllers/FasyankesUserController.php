@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use yii\db\Query;
+
 /**
  * FasyankesUserController implements the CRUD actions for FasyankesUser model.
  */
@@ -24,16 +26,6 @@ class FasyankesUserController extends MyController
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
-                ],
-            ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'create', 'reset-password', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
                 ],
             ],
         ];
@@ -52,6 +44,39 @@ class FasyankesUserController extends MyController
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionFasyankesList($q = null, $id = null) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        if (!is_null($q)) {
+            $query = new Query;
+            $query->select('idfas as id, namafas AS text')
+                ->from('mfasyankes')
+                ->where(['like', 'namafas', $q])
+                ->limit(20);
+            $command = $query->createCommand();
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => FasyankesUser::find($id)->name];
+        }
+        return $out;
+    }
+
+    public function actionBankList($id) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["idbank", "CONCAT(keterangan, ' - ', namabank) as text"], )
+            ->from('mbank')
+            ->where('idfas='.$id);
+            // ->limit(20);
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out = array_values($data);
+        return $out;
     }
 
     /**

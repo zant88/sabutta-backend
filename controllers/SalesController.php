@@ -33,16 +33,16 @@ class SalesController extends MyController
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view', 'create', 'submit-sales', 'print-surat-jalan', 'invoice', 'update', 'delete', 'surat-jalan'],
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
+            // 'access' => [
+            //     'class' => \yii\filters\AccessControl::class,
+            //     'rules' => [
+            //         [
+            //             'allow' => true,
+            //             'actions' => ['index', 'view', 'create', 'submit-sales', 'print-surat-jalan', 'invoice', 'update', 'delete', 'surat-jalan'],
+            //             'roles' => ['@'],
+            //         ],
+            //     ],
+            // ],
         ];
     }
 
@@ -114,6 +114,33 @@ class SalesController extends MyController
         $code = "SO" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
         
         return $code;
+    }
+
+    public function actionOrderList($q) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["idorder as id", "CONCAT(idorder, ' - ', status, ' - ', tanggalinput) as text"], )
+            ->from('order')
+            ->where("idorder LIKE '%".$q."%'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        return $out;
+    }
+
+    public function actionOrderDetail($id) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = ['results' => ['id' => '', 'text' => '']];
+        $query = new Query;
+        $query->select(["*"], )
+            ->from('orderdetail')
+            ->join('LEFT JOIN', 'jenissampah', 'orderdetail.idsampah=jenissampah.idsampah')
+            ->where("orderid='".$id."'");
+        $command = $query->createCommand();
+        $data = $command->queryAll();
+        $out['results'] = array_values($data);
+        return $out;
     }
 
     public function actionSubmitSales()

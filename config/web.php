@@ -88,7 +88,10 @@ $config = [
         'gridview' => [
             'class' => 'kartik\grid\Module',
             // other module settings
-        ]
+        ],
+        'gallery4' => [
+            'class' => 'zantknight\yii\gallery\Module',
+        ],
     ],
     'params' => $params,
 ];

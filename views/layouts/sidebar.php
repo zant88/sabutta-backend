@@ -69,38 +69,52 @@ use yii\helpers\Url;
       <?php
     }
     ?>
-    <?php 
+    <!-- <?php 
     if (Yii::$app->user->canAccess('transaction/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'transaction' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/transaction"]) ?>"><i class="fa fa-tasks"></i> <span>Arus Kas</span></a></li>
       <?php
     }
-    ?>
-    <?php 
+    ?> -->
+    <!-- <?php 
     if (Yii::$app->user->canAccess('vendor/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'vendor' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/vendor"]) ?>"><i class="fa fa-tasks"></i> <span>Vendor</span></a></li>
       <?php
     }
-    ?>
-    <?php 
+    ?> -->
+    <!-- <?php 
     if (Yii::$app->user->canAccess('sales/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'sales' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/sales"]) ?>"><i class="fa fa-tasks"></i> <span>Penjualan</span></a></li>
       <?php
     }
-    ?>
-    <?php 
+    ?> -->
+    <!-- <?php 
     if (Yii::$app->user->canAccess('invoice/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'invoice' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/invoice"]) ?>"><i class="fa fa-tasks"></i> <span>Invoice</span></a></li>
       <?php
     }
-    ?>
-    <?php 
+    ?> -->
+    <!-- <?php 
     if (Yii::$app->user->canAccess('report/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'report' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/report"]) ?>"><i class="fa fa-tasks"></i> <span>Report</span></a></li>
+      <?php
+    }
+    ?> -->
+    <?php 
+    if (Yii::$app->user->canAccess('withdraw/index')) {
+      ?>
+    <li <?= Yii::$app->controller->id == 'withdraw' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/withdraw"]) ?>"><i class="fa fa-tasks"></i> <span>Penarikan</span></a></li>
+      <?php
+    }
+    ?>
+    <?php 
+    if (Yii::$app->user->canAccess('order-revision/index')) {
+      ?>
+    <li <?= Yii::$app->controller->id == 'order-revision' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/order-revision"]) ?>"><i class="fa fa-tasks"></i> <span>Koreksi</span></a></li>
       <?php
     }
     ?>
