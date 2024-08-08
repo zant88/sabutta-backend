@@ -5,16 +5,27 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 
-$gridColumns=[['class' => 'yii\grid\SerialColumn'], 
+if (Yii::$app->user->can("admin")) {
+    $gridColumns=[
+        ['class' => 'yii\grid\SerialColumn'], 
+            'code',
+            'order_id',
+            'banksampah_code',
+            'description:ntext',
+            'revision_date',
+        ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {delete}'],
+    ];
+}else {
+    $gridColumns=[
+        ['class' => 'yii\grid\SerialColumn'], 
             'code',
             'order_id',
             'description:ntext',
             'revision_date',
+        ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {delete}'],
+    ];
+}
 
-
-    ['class' => 'yii\grid\ActionColumn', 'template' => '{view} {delete}'],
-
-];
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\OrderRevisionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */

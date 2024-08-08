@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Driver;
+use app\modules\user\models\User;
 
 /**
  * DriverSearch represents the model behind the search form of `app\models\Driver`.
@@ -57,6 +58,10 @@ class DriverSearch extends Driver
         }
 
         // grid filtering conditions
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['nmperusahaan' => $user->banksampah_code]);
+        }
         $query->andFilterWhere(['like', 'iddriver', $this->iddriver])
             ->andFilterWhere(['like', 'nama', $this->nama])
             ->andFilterWhere(['like', 'nmperusahaan', $this->nmperusahaan])

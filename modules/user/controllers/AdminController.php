@@ -6,6 +6,7 @@ use Yii;
 use amnah\yii2\user\models\User;
 use yii\web\Controller;
 use app\components\MyController;
+use app\models\Mbanksampah;
 use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -93,6 +94,9 @@ class AdminController extends MyController
 
         $post = Yii::$app->request->post();
         $userLoaded = $user->load($post);
+        if (!Yii::$app->user->can('admin')) {
+            $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
+        }
         $profile->load($post);
 
         // validate for ajax request
@@ -102,6 +106,7 @@ class AdminController extends MyController
         }
 
         if ($userLoaded && $user->validate() && $profile->validate()) {
+            
             $user->save(false);
             $profile->setUser($user->id)->save(false);
             return $this->redirect(['view', 'id' => $user->id]);
@@ -126,6 +131,7 @@ class AdminController extends MyController
 
         $post = Yii::$app->request->post();
         $userLoaded = $user->load($post);
+        $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         $profile->load($post);
 
         // validate for ajax request

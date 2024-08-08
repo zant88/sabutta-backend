@@ -14,6 +14,8 @@ use yii\filters\VerbFilter;
 use yii\data\ActiveDataProvider;
 use yii\db\Query;
 use app\components\MyController;
+use app\models\Mbanksampah;
+use app\modules\user\models\User;
 use kartik\mpdf\Pdf;
 
 /**
@@ -120,9 +122,15 @@ class SalesController extends MyController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
         $query = new Query;
+        if (Yii::$app->user->can('admn')) {
+            $strWhere = "idorder LIKE '%".$q."%'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $strWhere = "banksampah_id=".$user->banksampah_id." AND idorder LIKE '%".$q."%'";
+        }
         $query->select(["idorder as id", "CONCAT(idorder, ' - ', status, ' - ', tanggalinput) as text"], )
             ->from('order')
-            ->where("idorder LIKE '%".$q."%'");
+            ->where($strWhere);
         $command = $query->createCommand();
         $data = $command->queryAll();
         $out['results'] = array_values($data);

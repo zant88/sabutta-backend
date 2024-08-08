@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Mbanksampah;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -18,6 +19,73 @@ $role = $module->model("Role");
 
 $this->title = Yii::t('user', 'Users');
 $this->params['breadcrumbs'][] = $this->title;
+
+
+if (Yii::$app->user->can("admin")) {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+
+        [
+            'attribute' => 'role_id',
+            'label' => Yii::t('user', 'Role'),
+            'filter' => $role::dropdown(),
+            'value' => function($model, $index, $dataColumn) use ($role) {
+                $roleDropdown = $role::dropdown();
+                return $roleDropdown[$model->role_id];
+            },
+        ],
+        [
+            'attribute' => 'status',
+            'label' => Yii::t('user', 'Status'),
+            'filter' => $user::statusDropdown(),
+            'value' => function($model, $index, $dataColumn) use ($user) {
+                $statusDropdown = $user::statusDropdown();
+                return $statusDropdown[$model->status];
+            },
+        ],
+        'email:email',
+        'profile.full_name',
+        [
+            'attribute' => 'banksampah_id',
+            'label' => Yii::t('user', 'Nama Bank Sampah'),
+            'filter' => Mbanksampah::dropdown(),
+            'value' => function($model, $index, $dataColumn) use ($role) {
+               return $model->banksampah_id != null ? $model->bS->full_name : '-';
+            },
+        ],
+        'created_at',
+
+        ['class' => 'yii\grid\ActionColumn'],
+    ];
+}else {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+
+        [
+            'attribute' => 'role_id',
+            'label' => Yii::t('user', 'Role'),
+            'filter' => $role::dropdown(),
+            'value' => function($model, $index, $dataColumn) use ($role) {
+                $roleDropdown = $role::dropdown();
+                return $roleDropdown[$model->role_id];
+            },
+        ],
+        [
+            'attribute' => 'status',
+            'label' => Yii::t('user', 'Status'),
+            'filter' => $user::statusDropdown(),
+            'value' => function($model, $index, $dataColumn) use ($user) {
+                $statusDropdown = $user::statusDropdown();
+                return $statusDropdown[$model->status];
+            },
+        ],
+        'email:email',
+        'profile.full_name',
+        'created_at',
+
+        ['class' => 'yii\grid\ActionColumn'],
+    ];
+}
 ?>
 
 <div class="user-index">
@@ -36,45 +104,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
-                'columns' => [
-                    ['class' => 'yii\grid\SerialColumn'],
-
-                    'id',
-                    [
-                        'attribute' => 'role_id',
-                        'label' => Yii::t('user', 'Role'),
-                        'filter' => $role::dropdown(),
-                        'value' => function($model, $index, $dataColumn) use ($role) {
-                            $roleDropdown = $role::dropdown();
-                            return $roleDropdown[$model->role_id];
-                        },
-                    ],
-                    [
-                        'attribute' => 'status',
-                        'label' => Yii::t('user', 'Status'),
-                        'filter' => $user::statusDropdown(),
-                        'value' => function($model, $index, $dataColumn) use ($user) {
-                            $statusDropdown = $user::statusDropdown();
-                            return $statusDropdown[$model->status];
-                        },
-                    ],
-                    'email:email',
-                    'profile.full_name',
-                    'profile.timezone',
-                    'created_at',
-                    // 'username',
-                    // 'password',
-                    // 'auth_key',
-                    // 'access_token',
-                    // 'logged_in_ip',
-                    // 'logged_in_at',
-                    // 'created_ip',
-                    // 'updated_at',
-                    // 'banned_at',
-                    // 'banned_reason',
-
-                    ['class' => 'yii\grid\ActionColumn'],
-                ],
+                'columns' => $gridColumns,
             ]); ?>
             <?php \yii\widgets\Pjax::end(); ?>
         </div>

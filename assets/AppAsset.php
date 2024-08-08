@@ -34,6 +34,7 @@ class AppAsset extends AssetBundle
         "https://cdnjs.cloudflare.com/ajax/libs/axios/0.26.1/axios.min.js",
         'js/yii_overrides.js',
         'js/stisla.js',
+        'js/chart.min.js',
         'js/scripts.js',
     ];
     public $depends = [

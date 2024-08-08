@@ -10,8 +10,7 @@ use yii\widgets\Pjax;
 use kartik\export\ExportMenu;
 use yii\widgets\ActiveForm;
 
-$gridColumns = [
-  ['class' => 'yii\grid\SerialColumn'],
+$dataColumn = [
   [
     'label' => 'Pengguna',
     'value' => function ($model) {
@@ -99,11 +98,21 @@ $gridColumns = [
       return $model->nilai;
     }
   ],
-  
-
-
-  //  ['class' => 'app\widgets\grid\ActionColumn'],
-
+];
+if (Yii::$app->user->can("admin")) {
+  $dataColumn = [
+    ...$dataColumn,
+    [
+      'label' => 'Bank Sampah',
+      'value' => function ($model) {
+        return $model->banksampah_code;
+      }
+    ],
+  ];
+}
+$gridColumns = [
+  ['class' => 'yii\grid\SerialColumn'],
+  ...$dataColumn,
 ];
 
 /* @var $this yii\web\View */

@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use app\models\Mbanksampah;
 
 /**
  * @var yii\web\View $this
@@ -24,6 +25,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
           <?= $this->render('_form', [
               'user' => $user,
+              'bs_list' => Mbanksampah::dropdown(),
               'profile' => $profile,
           ]) ?>
         </div>

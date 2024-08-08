@@ -5,27 +5,28 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 
-$gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
-    'iddriver',
-    'nama',
-    'nmperusahaan',
-    'telppersh',
-    'telpdriver',
-    // 'lat',
-    // 'lon',
-    // 'sts',
-    // 'stsjob',
-    // 'foto',
-    // 'userid',
-    // 'pass',
-    // 'tokenfb',
-    // 'role',
-
-
-    ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
-
-];
+if (Yii::$app->user->can("admin")) {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'iddriver',
+        'nama',
+        'nmperusahaan',
+        'telppersh',
+        'telpdriver',
+        ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+    
+    ];
+}else {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'iddriver',
+        'nama',
+        'telppersh',
+        'telpdriver',
+        ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+    
+    ];
+}
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\DriverSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */

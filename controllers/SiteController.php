@@ -10,6 +10,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\components\MyController;
+use app\modules\user\models\User;
 
 class SiteController extends MyController
 {
@@ -164,6 +165,89 @@ class SiteController extends MyController
         return $out;
     }
 
+    public function actionGetChartWeekly() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $month = date('n');
+        $year = date('y');
+        if (Yii::$app->user->can('admin')) {
+            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year' AND banksampah_id=".$user->banksampah_id;
+        }
+        $dates = [];
+        for ($i=1;$i<=7; $i++) {
+            $date = date('Y-m-d', strtotime("-$i days"));
+            $strWhere = "tanggalinput = '".$date."'";
+            $query = (new \yii\db\Query())->from('order')
+                ->where($strWhere);
+            $weightTotal = $query->sum('berat');
+            if (!$weightTotal) {
+                $weightTotal = 0;
+            }
+            $dates[] = [
+                'day' => date('l', strtotime($date)),
+                'weight' => $weightTotal
+            ];
+        }
+        $out = [
+            'success' => true,
+            'data' => $dates
+        ];
+
+        return $out;
+    }
+
+    public function actionGetChartTodayWeight() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        if (Yii::$app->user->can('admin')) {
+            $date = date('Y-m-d', strtotime("-1 days"));
+            $strWhere = "tanggalinput = '".$date."'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $date = date('Y-m-d', strtotime("-1 days"));
+            $strWhere = "tanggalinput = '".$date."' AND banksampah_id=".$user->banksampah_id;
+        }
+        $query = (new \yii\db\Query())->from('order')
+            ->where($strWhere);
+        $weightYesterday = $query->sum('berat');
+        if (!$weightYesterday) {
+            $weightYesterday = 0;
+        }
+
+        if (Yii::$app->user->can('admin')) {
+            $date = date('Y-m-d');
+            $strWhere = "tanggalinput = '".$date."'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $date = date('Y-m-d');
+            $strWhere = "tanggalinput = '".$date."' AND banksampah_id=".$user->banksampah_id;
+        }
+        $query = (new \yii\db\Query())->from('order')
+            ->where($strWhere);
+        $weightToday = $query->sum('berat');
+        if (!$weightToday) {
+            $weightToday = 0;
+        }
+        $out = [
+            'success' => true,
+            'data' => [
+                'today_weight' => $weightToday,
+                'yesterday_weight' => $weightYesterday,
+            ]
+        ];
+
+        return $out;
+    }
+
     /**
      * get This month Transaction Fee
      */
@@ -205,8 +289,14 @@ class SiteController extends MyController
             'data' => 0
         ];
         $month = date('n');
+        if (Yii::$app->user->can('admin')) {
+            $strWhere = "MONTH(tanggalinput)='$month'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $strWhere = "MONTH(tanggalinput)='$month' AND banksampah_id=".$user->banksampah_id;
+        }
         $query = (new \yii\db\Query())->from('order')
-            ->where("MONTH(tanggalinput)='$month'");
+            ->where($strWhere);
         $weightTotal = $query->sum('berat');
         if (!$weightTotal) {
             $weightTotal = 0;
@@ -229,11 +319,12 @@ class SiteController extends MyController
         if (Yii::$app->user->isGuest) {
             $this->redirect('user/login');
         }else {
-            if (!Yii::$app->user->can('admin')) { 
-                $this->redirect(Yii::$app->user->getRedirect());
-            }else {
-                return $this->render('index');
-            }
+            // if (!Yii::$app->user->can('admin')) { 
+            //     $this->redirect(Yii::$app->user->getRedirect());
+            // }else {
+            //     return $this->render('index');
+            // }
+            return $this->render('index');
         }
     }
 

@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Stock;
+use app\modules\user\models\User;
 
 /**
  * StockSearch represents the model behind the search form of `app\models\Stock`.
@@ -86,6 +87,10 @@ class StockSearch extends Stock
         if ($this->userName != null) {
             $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);
         }
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['banksampah_id' => $user->banksampah_id]);
+        }
         $query->andFilterWhere([
             'nilai' => $this->nilai,
             'tgl' => $this->tgl,
@@ -139,6 +144,10 @@ class StockSearch extends Stock
             }
             
         }
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
+        }
         if ($this->userName != null) {
             $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);
         }
@@ -155,7 +164,7 @@ class StockSearch extends Stock
             'tgl' => SORT_DESC,
         ]);
 
-        return number_format($query->sum('nilai'), 3, ',', '.');
+        return $query->sum('nilai');
     }
 
     /**
@@ -189,14 +198,17 @@ class StockSearch extends Stock
             }else {
                 $query->andFilterWhere(['like', 'lokasipenjemputan', $this->trxType]);
             }
-            
+        }
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
         }
         
         if ($this->userName != null) {
             $query->joinWith('user')->andFilterWhere(['like', 'namafas', $this->userName]);
         }
         
-        return number_format($query->sum('harga'), 0, ',', '.');
+        return $query->sum('harga');
     }
 
     /**

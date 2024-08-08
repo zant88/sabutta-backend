@@ -5,46 +5,43 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 
-$gridColumns = [
-    ['class' => 'yii\grid\SerialColumn'],
-    // 'alamat',
-    // 'fax',
-    // 'owner',
-    // 'namapetugas',
-    // 'jabatanpetugas',
-    // 'npwp',
-    // 'email:email',
-    // 'website',
-    // 'bidangusaha',
-    // 'notaris',
-    // 'alamatnotaris',
-    // 'nomoraktenotaris',
-    // 'tglaktenotaris',
-    // 'nosiup',
-    // 'pkp',
-    // 'nodomisilipersh',
-    // 'notandapersh',
-    'userid',
-    // 'pass',
-    'namafas',
-    // 'ttdmanagement',
-    // 'ttdclient',
-    // 'lat',
-    // 'lon',
-    // 'tokenfb',
-    // 'role',
-    // 'tglinput',
-    'nip',
-    'nik',
-    'telp',
-    'email:email',
-    
-    // 'saldo',
+// $gridColumns = [
+//     ['class' => 'yii\grid\SerialColumn'],
+//     'userid',
+//     'owner',
+//     'namafas',
+//     'nip',
+//     'nik',
+//     'telp',
+//     'email:email',
+//     ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+// ];
 
 
-    ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
-
-];
+if (Yii::$app->user->can("admin")) {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'userid',
+        'owner',
+        'namafas',
+        'nip',
+        'nik',
+        'telp',
+        'email:email',
+        ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+    ];
+}else {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'userid',
+        'namafas',
+        'nip',
+        'nik',
+        'telp',
+        'email:email',
+        ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+    ];
+}
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\FasyankesUserSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -63,7 +60,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <p>
                 <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-success']) ?>
-                <?= Html::a(Yii::t('app', 'New User'), ['create'], ['class' => 'btn btn-primary']) ?>
             </p>
             <?php Pjax::begin(); ?>
     

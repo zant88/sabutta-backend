@@ -162,9 +162,6 @@ class RoleAuthController extends MyController
                 foreach ($roleAuth as $item) {
                     $arrID[] = $item->id;
                 }
-                echo '<pre>';
-                print_r($roleAuth);
-                die;
                 
                 $authMaster = AuthMaster::find()
                     ->where(['module' => $module])

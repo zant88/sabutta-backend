@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\Withdraw;
+use app\modules\user\models\User;
 
 /**
  * WithdrawSearch represents the model behind the search form of `app\models\Withdraw`.
@@ -58,6 +59,11 @@ class WithdrawSearch extends Withdraw
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['banksampah_id' => $user->banksampah_id]);
         }
 
         // grid filtering conditions

@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\FasyankesUser;
+use app\modules\user\models\User;
 
 /**
  * FasyankesUserSearch represents the model behind the search form of `app\models\FasyankesUser`.
@@ -55,6 +56,11 @@ class FasyankesUserSearch extends FasyankesUser
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['owner' => $user->banksampah_code]);
         }
 
         // grid filtering conditions

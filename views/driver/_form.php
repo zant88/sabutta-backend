@@ -17,42 +17,18 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
         </div>
         <div class="col-lg-6">
-            <?= $form->field($model, 'nmperusahaan')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'telpdriver')->textInput(['maxlength' => true, 'placeholder' => '0821xx']) ?>
         </div>
+        <?php 
+        if ($model->isNewRecord) {
+            ?>
         <div class="col-lg-6">
-            <?= $form->field($model, 'telpdriver')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'pass')->textInput(['maxlength' => true, 'readonly' => true, 'value' => 'enviro']) ?>
         </div>
-        <div class="col-lg-6">
-            <?= $form->field($model, 'role')
-            ->dropDownList(
-                ArrayHelper::map($mrole, 'idrole', 'namarole'),           // Flat array ('id'=>'label')
-                ['prompt'=>'']    // options
-            ); ?>
-        </div>
-        <div class="col-lg-6">
-
-        </div>
+            <?php
+        }
+        ?>
     </div>
-
-    <!-- <?= $form->field($model, 'telppersh')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'lat')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'lon')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'sts')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'stsjob')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'foto')->textInput() ?> -->
-
-    <!-- <?= $form->field($model, 'userid')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'pass')->passwordInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'tokenfb')->textInput(['maxlength' => true]) ?> -->
-
-    <!-- <?= $form->field($model, 'role')->textInput(['maxlength' => true]) ?> -->
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>

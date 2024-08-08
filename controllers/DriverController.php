@@ -11,6 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\modules\user\models\User;
 
 /**
  * DriverController implements the CRUD actions for Driver model.
@@ -91,6 +92,9 @@ class DriverController extends MyController
                 $model->telppersh = $model->telpdriver;
                 $model->userid = $model->iddriver;
                 $model->pass = md5('enviro');
+                $user = User::findOne(Yii::$app->user->id);
+                $model->nmperusahaan = $user->banksampah_code;
+                $model->role = '0102';
                 if ($model->validate()) {
                     $apps->value = (string) ($currValue + 1);
                     if ($apps->validate()  && $apps->save()) {

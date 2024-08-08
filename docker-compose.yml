@@ -1,11 +1,24 @@
 version: '2'
 services:
+  web:
+    image: phundament/nginx-one:1.9-5.1.1
+    networks:
+      - sabutta
+    environment:
+      - FASTCGI_PASS_HOST=php
+    ports:
+      - '6001:80'
+    depends_on:
+      - php
+    volumes:
+      # Application testing
+      - ./web:/app/web:delegated
+    volumes_from:
+      - php
+
   php:
     # image: yiisoftware/yii2-php:7.4-apache
-    container_name: sabutta_jm_api2-php
-    image: yiisoftware/yii2-php:8.0-apache
-    ports:
-      - '8023:80'
+    image: yiisoftware/yii2-php:8.1-fpm
     volumes:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
@@ -13,7 +26,6 @@ services:
       - sabutta
 
   db:
-    platform: linux/x86_64
     image: mysql:5.7
     networks:
       - sabutta
@@ -26,17 +38,32 @@ services:
       # Password for root access
       MYSQL_ROOT_PASSWORD: Fasyankes!@#
     ports:
-      - "3000:3000"
+      # <Port exposed> : < MySQL Port running inside container>
+      - '4306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '4306'
+      # Where our data will be persisted
     volumes:
-      - ./wa-bot:/home/node/app
-      - ./wa-bot/node_modules:/home/node/app/node_modules
-      # - ./wa-bot/node_modules:/home/node/app/node_modules
+      - my-db:/var/lib/mysql
+  
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    links: 
+      - db:db
+    ports:
+      - 6002:80
     networks:
-      - sabutta_jm2_prod
+      - sabutta
+    environment:
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+      MYSQL_ROOT_PASSWORD: Fasyankes!@#
+      PMA_HOST: db
+
 
 networks: 
-  sabutta_jm2_prod:
+  sabutta:
 
 volumes:
-  node_modules: 
-
+  my-db:

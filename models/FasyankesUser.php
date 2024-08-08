@@ -39,6 +39,7 @@ use Yii;
  * @property string|null $nip
  * @property string|null $nik
  * @property float|null $saldo
+ * @property string|null $owner
  *
  * @property Refdokumen[] $iddoks
  * @property Mbank[] $mbanks
@@ -61,7 +62,7 @@ class FasyankesUser extends \yii\db\ActiveRecord
     {
         return [
             [['idfas', 'userid', 'pass'], 'required'],
-            [['tglaktenotaris', 'tglinput'], 'safe'],
+            [['tglaktenotaris', 'tglinput', 'owner'], 'safe'],
             [['ttdmanagement', 'ttdclient'], 'string'],
             [['saldo'], 'number'],
             [['idfas', 'telp', 'fax'], 'string', 'max' => 20],
@@ -111,6 +112,7 @@ class FasyankesUser extends \yii\db\ActiveRecord
             'nip' => 'NIP',
             'nik' => 'NIK',
             'saldo' => 'Saldo',
+            'owner' => 'Asal Bank Sampah',
         ];
     }
 

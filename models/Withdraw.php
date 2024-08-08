@@ -15,6 +15,8 @@ use zantknight\yii\gallery\Gallery4Behavior;
  * @property string|null $status
  * @property string|null $request_date
  * @property string|null $transfer_date
+ * @property int|null $banksampah_id
+ * @property string|null $banksampah_code
  */
 class Withdraw extends \yii\db\ActiveRecord
 {
@@ -60,6 +62,8 @@ class Withdraw extends \yii\db\ActiveRecord
             'idbank' => Yii::t('app', 'Idbank'),
             'amount' => Yii::t('app', 'Amount'),
             'status' => Yii::t('app', 'Status'),
+            'banksampah_id' => Yii::t('app', 'Bank Sampah ID'),
+            'banksampah_code' => Yii::t('app', 'Bank Sampah Code'),
             'request_date' => Yii::t('app', 'Request Date'),
             'transfer_date' => Yii::t('app', 'Transfer Date'),
         ];
@@ -75,4 +79,11 @@ class Withdraw extends \yii\db\ActiveRecord
         return $this->hasOne(Mbank::className(), ['idbank' => 'idbank']);
     }
 
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBS()
+    {
+        return $this->hasOne(Mbanksampah::className(), ['id' => 'banksampah_id']);
+    }
 }

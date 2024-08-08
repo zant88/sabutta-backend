@@ -16,6 +16,7 @@ use yii\widgets\ActiveForm;
     <div class="row">
         <div class="col-lg-6">
             <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+            <?= $form->field($model, 'redirect_path')->textInput(['maxlength' => true]) ?>
         </div>
     </div>    
     

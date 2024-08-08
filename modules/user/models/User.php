@@ -1,6 +1,7 @@
 <?php
 namespace app\modules\user\models;
 
+use app\models\Mbanksampah;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -19,6 +20,8 @@ use ReflectionClass;
  * @property string $username
  * @property string $password
  * @property string $auth_key
+ * @property integer $banksampah_id
+ * @property string $banksampah_code
  * @property string $access_token
  * @property string $logged_in_ip
  * @property string $logged_in_at
@@ -109,7 +112,7 @@ class User extends ActiveRecord implements IdentityInterface
             [['currentPassword'], 'validateCurrentPassword', 'on' => ['account']],
 
             // admin crud rules
-            [['role_id', 'status'], 'required', 'on' => ['admin']],
+            [['role_id', 'status', 'banksampah_id', 'banksampah_code'], 'required', 'on' => ['admin']],
             [['role_id', 'status'], 'integer', 'on' => ['admin']],
             [['banned_at'], 'integer', 'on' => ['admin']],
             [['banned_reason'], 'string', 'max' => 255, 'on' => 'admin'],
@@ -150,6 +153,7 @@ class User extends ActiveRecord implements IdentityInterface
         return [
             'id' => Yii::t('user', 'ID'),
             'role_id' => Yii::t('user', 'Role ID'),
+            'banksampah_id' => Yii::t('user', 'Bank Sampah ID'),
             'status' => Yii::t('user', 'Status'),
             'email' => Yii::t('user', 'Email'),
             'username' => Yii::t('user', 'Username'),
@@ -193,6 +197,14 @@ class User extends ActiveRecord implements IdentityInterface
     {
         $profile = $this->module->model("Profile");
         return $this->hasOne($profile::className(), ['user_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBS()
+    {
+        return $this->hasOne(Mbanksampah::className(), ['id' => 'banksampah_id']);
     }
 
     /**

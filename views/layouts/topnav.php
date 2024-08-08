@@ -1,5 +1,6 @@
 <?php
 
+use app\modules\user\models\User;
 use yii\helpers\Url;
 use yii\bootstrap4\Dropdown;
 ?>
@@ -32,7 +33,10 @@ use yii\bootstrap4\Dropdown;
   </li>
   <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
       <img alt="image" src="<?= Url::to(["img/avatar/avatar-1.png"]) ?>" class="rounded-circle mr-1">
-      <div class="d-sm-none d-lg-inline-block">Hi, Admin</div>
+      <div class="d-sm-none d-lg-inline-block">Hi, <?php if (!Yii::$app->user->isGuest){ 
+        $user = User::findOne(Yii::$app->user->id);
+        echo $user->profile->full_name;
+       } ?></div>
     </a>
     <?php
     echo Dropdown::widget([

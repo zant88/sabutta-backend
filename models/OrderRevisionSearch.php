@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\OrderRevision;
+use app\modules\user\models\User;
 
 /**
  * OrderRevisionSearch represents the model behind the search form of `app\models\OrderRevision`.
@@ -55,6 +56,11 @@ class OrderRevisionSearch extends OrderRevision
             // uncomment the following line if you do not want to return any records when validation fails
             // $query->where('0=1');
             return $dataProvider;
+        }
+
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['banksampah_id' => $user->banksampah_id]);
         }
 
         // grid filtering conditions

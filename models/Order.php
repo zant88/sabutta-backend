@@ -80,4 +80,12 @@ class Order extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Orderdetail::className(), ['orderid' => 'idorder']);
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBS()
+    {
+        return $this->hasOne(Mbanksampah::className(), ['id' => 'banksampah_id']);
+    }
 }

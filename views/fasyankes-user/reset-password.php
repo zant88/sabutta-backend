@@ -4,6 +4,7 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use app\models\FasyankesUser;
+use app\modules\user\models\User;
 use yii\helpers\ArrayHelper;
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\FasyankesUserSearch */
@@ -22,12 +23,19 @@ $this->params['breadcrumbs'][] = $this->title;
       <h4><?= Html::encode($this->title) ?></h4>
     </div>
     <div class="card-body">
+    <p>Password akan kembali menjadi "enviro"</p>
 <?php 
   //use app\models\Country;
-$users=FasyankesUser::find()->all();
-
-//use yii\helpers\ArrayHelper;
-$listData=ArrayHelper::map($users, 'idfas','namafas');
+  if (Yii::$app->user->can('admin')) {
+    $users=FasyankesUser::find()->all();
+  }else {
+    $user = User::findOne(Yii::$app->user->id);
+    $users=FasyankesUser::find()->where([
+      'owner' => $user->banksampah_code
+    ])->all();
+  }
+  //use yii\helpers\ArrayHelper;
+  $listData=ArrayHelper::map($users, 'idfas','namafas');
 ?>
       <select class="form-control" id="user">
         <?php
@@ -39,7 +47,7 @@ $listData=ArrayHelper::map($users, 'idfas','namafas');
         ?>
       </select>
       <p>
-        <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-success', 'id'=>'btn-reset']) ?>
+        <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-success mt-3', 'id'=>'btn-reset']) ?>
       </p>
     </div>
   </div>
@@ -62,7 +70,7 @@ $this->registerJs(
     var csrfToken = $('meta[name=\"csrf-token\"]').attr(\"content\");
     setTimeout(function(){
       $('#user').select2();
-    }, 1000);
+    }, 500);
     $('#btn-reset').on('click', function(e){
       e.preventDefault();
       $.ajax({

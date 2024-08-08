@@ -13,6 +13,8 @@ use Yii;
  * @property string|null $tgl
  * @property string|null $jnsstock
  * @property string|null $idorder
+ * @property int|null $banksampah_id
+ * @property string|null $banksampah_code
  */
 class Stock extends \yii\db\ActiveRecord
 {
@@ -67,5 +69,13 @@ class Stock extends \yii\db\ActiveRecord
     public function getOrder()
     {
         return $this->hasOne(Order::className(), ['idorder' => 'idorder']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getBS()
+    {
+        return $this->hasOne(Mbanksampah::className(), ['id' => 'banksampah_id']);
     }
 }

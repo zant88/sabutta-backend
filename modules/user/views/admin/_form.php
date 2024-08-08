@@ -42,6 +42,15 @@ $role = $module->model("Role");
             <?= $form->field($user, 'status')->dropDownList($user::statusDropdown()); ?>
         </div>
         <?php 
+        if (Yii::$app->user->can("admin")) {
+            ?>
+        <div class="col-lg-6">
+            <?= $form->field($user, 'banksampah_id')->dropDownList($bs_list); ?>
+        </div>
+            <?php
+        }
+        ?>
+        <?php 
         if (!$user->isNewRecord) {
             ?>
         <div class="col-lg-6">
