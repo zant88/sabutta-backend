@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string $banksampahid
+ * @property int $parent_id
  * @property string $full_name
  * @property string|null $email
  * @property string|null $phone_number
@@ -33,8 +34,9 @@ class Mbanksampah extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['banksampahid', 'full_name'], 'required'],
+            [['banksampahid', 'full_name', 'email', 'phone_number'], 'required'],
             [['address', 'json'], 'string'],
+            [['parent_id'], 'number'],
             [['created_at', 'updated_at'], 'safe'],
             [['banksampahid'], 'string', 'max' => 50],
             [['full_name', 'email'], 'string', 'max' => 100],
@@ -52,6 +54,7 @@ class Mbanksampah extends \yii\db\ActiveRecord
         return [
             'id' => Yii::t('app', 'ID'),
             'banksampahid' => Yii::t('app', 'Banksampahid'),
+            'parent_id' => Yii::t('app', 'Parent'),
             'full_name' => Yii::t('app', 'Full Name'),
             'email' => Yii::t('app', 'Email'),
             'phone_number' => Yii::t('app', 'Phone Number'),

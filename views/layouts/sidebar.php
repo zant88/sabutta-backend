@@ -63,6 +63,13 @@ use yii\helpers\Url;
     }
     ?>
     <?php 
+    if (Yii::$app->user->canAccess('banksampah/index')) {
+      ?>
+    <li <?= Yii::$app->controller->id == 'banksampah' ? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/banksampah"]) ?>"><i class="fa fa-tasks"></i> <span>Bank Sampah</span></a></li>
+      <?php
+    }
+    ?>
+    <?php 
     if (Yii::$app->user->canAccess('stock/index')) {
       ?>
     <li <?= Yii::$app->controller->id == 'stock' && Yii::$app->controller->action->id == 'index'? 'class="active"' : '' ?>><a class="nav-link" href="<?= Url::to(["/stock"]) ?>"><i class="fa fa-tasks"></i> <span>Transaksi Harian</span></a></li>

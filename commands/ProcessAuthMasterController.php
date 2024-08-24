@@ -40,11 +40,14 @@ class ProcessAuthMasterController extends Controller
 
     private function handleInitAuthAdmin()
     {
-        $role = Role::find()->where(['name' => 'Admin'])->one();
+        $role = Role::find()->where(['can_admin' => 1])->one();
         if ($role) {
             //init all auth master for default admin role
             $authMasterData = AuthMaster::find()->all();
             foreach ($authMasterData as $authMaster) {
+                // echo 'this is auth master';
+                // echo $authMaster->id;
+                // echo '\n';
                 $roleAuth = RoleAuth::find()->where([
                     'role_id' => $role->id, 
                     'auth_id' => $authMaster->id

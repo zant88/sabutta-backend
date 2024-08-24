@@ -87,13 +87,14 @@ class AdminController extends MyController
     {
         /** @var \amnah\yii2\user\models\User $user */
         /** @var \amnah\yii2\user\models\Profile $profile */
-
+        
         $user = $this->module->model("User");
         $user->setScenario("admin");
         $profile = $this->module->model("Profile");
 
         $post = Yii::$app->request->post();
         $userLoaded = $user->load($post);
+        $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         if (!Yii::$app->user->can('admin')) {
             $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         }
@@ -105,11 +106,14 @@ class AdminController extends MyController
             return ActiveForm::validate($user, $profile);
         }
 
-        if ($userLoaded && $user->validate() && $profile->validate()) {
-            
+        if ($userLoaded) {
             $user->save(false);
             $profile->setUser($user->id)->save(false);
             return $this->redirect(['view', 'id' => $user->id]);
+        }else {
+            echo '<pre>';
+            print_r($user->getErrors());
+            die;
         }
 
         // render

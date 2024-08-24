@@ -46,6 +46,9 @@ class MyController extends \yii\web\Controller
                             'role_id' => $user->role_id,
                             'auth_id' => $auth_master->id
                         ])->one();
+                    // echo 'user role';
+                    // print_r($user->role_id);
+                    // die;
                     if(!$user_role){
                         if ($controller_id == 'site' && $action_id == 'index') {
                             $user = User::findOne($user_id);

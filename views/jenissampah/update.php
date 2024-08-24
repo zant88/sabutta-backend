@@ -1,6 +1,8 @@
 <?php
 
 use app\models\FasyankesUser;
+use app\models\Mbanksampah;
+use app\modules\user\models\User;
 use yii\helpers\Html;
 use kartik\select2\Select2; // or kartik\select2\Select2
 use yii\web\JsExpression;
@@ -17,7 +19,10 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Sampah'), 'ur
 $this->params['breadcrumbs'][] = ['label' => $model->idsampah, 'url' => ['view', 'id' => $model->idsampah]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
-$url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
+// $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
+$url = \yii\helpers\Url::to(['banksampah/list']);
+$user = User::findOne(Yii::$app->user->id);
+$bankSampah = Mbanksampah::findOne($user->banksampah_id);
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -37,6 +42,10 @@ $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
           ]) ?>
         </div>
       </div>
+      <?php
+      
+      if ($bankSampah->parent_id == null || $bankSampah->parent_id == '') {
+        ?>
       <div class="card">
         <div class="card-header">
           <h4>Konfigurasi Harga</h4>
@@ -46,7 +55,7 @@ $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label>Nama Vendor / User</label>
+                  <label>Nama Vendor / User</label><br />
                   <?=  Select2::widget([
                       'name' => 'vendor_user',
                       'options' => [
@@ -93,11 +102,16 @@ $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
             <tbody id="detail-addition">
             </tbody>
           </table>
-          <div class="form-group mt-5">
-            <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
-          </div>
         </div>
       </div>
+      <?php 
+      }
+      ?>  
+      <div class="form-group text-right">
+        <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
+      </div>
+        
+      
     </div>
     <div class="col-lg-4">
       <h5>Detail</h5>
@@ -107,6 +121,7 @@ $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
             <th scope="col">#</th>
             <th scope="col">User / Vendor</th>
             <th scope="col">Harga</th>
+            <th scope="col"></th>
           </tr>
           <?php 
           $data = json_decode($model->json);
@@ -116,6 +131,9 @@ $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
               <td scope="col"><?= $key + 1 ?></td>
               <td scope="col"><?= FasyankesUser::findOne($item->vendorId) != null ? FasyankesUser::findOne($item->vendorId)->namafas : $item->vendorId ?></td>
               <td scope="col"><?= $item->hargaPerKg ? number_format($item->hargaPerKg) : '-' ?></td>
+              <td><a class="btn btn-sm btn-danger btn-round" href="javascript:void()">
+                <i class="fa fa-trash" aria-hidden=""></i></a>
+              </td>
             </tr>
             <?php
           }
