@@ -21,8 +21,17 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
 // $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);
 $url = \yii\helpers\Url::to(['banksampah/list']);
-$user = User::findOne(Yii::$app->user->id);
-$bankSampah = Mbanksampah::findOne($user->banksampah_id);
+$canConfigureBankSampahPrice = false;
+if (Yii::$app->user->can('admin')) {
+  $canConfigureBankSampahPrice = true;
+}else {
+  $user = User::findOne(Yii::$app->user->id);
+  $bankSampah = Mbanksampah::findOne($user->banksampah_id);
+  if ($bankSampah->parent_id == null || $bankSampah->parent_id == '') { 
+    $canConfigureBankSampahPrice = true;
+  }
+}
+
 ?>
 
 <?php $form = ActiveForm::begin(); ?>
@@ -43,24 +52,23 @@ $bankSampah = Mbanksampah::findOne($user->banksampah_id);
         </div>
       </div>
       <?php
-      
-      if ($bankSampah->parent_id == null || $bankSampah->parent_id == '') {
+      if ($canConfigureBankSampahPrice) {
         ?>
       <div class="card">
         <div class="card-header">
-          <h4>Konfigurasi Harga</h4>
+          <h4>Konfigurasi Harga per Bank Sampah</h4>
         </div>
         <div class="card-body">
           <form>
             <div class="row">
               <div class="col-lg-6">
                 <div class="form-group">
-                  <label>Nama Vendor / User</label><br />
+                  <label>Nama Bank Sampah</label><br />
                   <?=  Select2::widget([
                       'name' => 'vendor_user',
                       'options' => [
                           'id' => 'user-selection',
-                          'placeholder' => 'Select vendor / User ...',
+                          'placeholder' => 'Select bank sampah ...',
                           'multiple' => false
                       ],
                       'pluginOptions' => [
@@ -110,8 +118,6 @@ $bankSampah = Mbanksampah::findOne($user->banksampah_id);
       <div class="form-group text-right">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
       </div>
-        
-      
     </div>
     <div class="col-lg-4">
       <h5>Detail</h5>
@@ -119,23 +125,30 @@ $bankSampah = Mbanksampah::findOne($user->banksampah_id);
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">User / Vendor</th>
+            <th scope="col">Bank Sampah</th>
             <th scope="col">Harga</th>
-            <th scope="col"></th>
+            <!-- <th scope="col"></th> -->
           </tr>
           <?php 
           $data = json_decode($model->json);
+          $user = User::findOne(Yii::$app->user->id);
+          $iCounter = 1;
           foreach ($data->vendors as $key => $item) {
-            ?>
-            <tr>
-              <td scope="col"><?= $key + 1 ?></td>
-              <td scope="col"><?= FasyankesUser::findOne($item->vendorId) != null ? FasyankesUser::findOne($item->vendorId)->namafas : $item->vendorId ?></td>
-              <td scope="col"><?= $item->hargaPerKg ? number_format($item->hargaPerKg) : '-' ?></td>
-              <td><a class="btn btn-sm btn-danger btn-round" href="javascript:void()">
-                <i class="fa fa-trash" aria-hidden=""></i></a>
-              </td>
-            </tr>
-            <?php
+            if (property_exists($item, 'parentId')) {
+              if ($item->parentId == $user->banksampah_id) {
+                ?>
+                <tr>
+                  <td scope="col"><?= $iCounter ?></td>
+                  <td scope="col"><?= property_exists($item, 'vendorName') ? $item->vendorName : $item->vendorId ?></td>
+                  <td scope="col"><?= $item->hargaPerKg ? number_format($item->hargaPerKg) : '-' ?></td>
+                  <!-- <td><a class="btn btn-sm btn-danger btn-round" href="javascript:void()">
+                    <i class="fa fa-trash" aria-hidden=""></i></a>
+                  </td> -->
+                </tr>
+                <?php
+                $iCounter++;
+              }
+            }
           }
           ?>
         </thead>
@@ -187,7 +200,14 @@ $('#btn-add').on('click', function(e){
 
   if (isAdding) {
     userList.push({id: id, text: text});
-    $('#detail-addition').append('<tr><td scope=\"row\">'+iAdd+'</td><td>'+text+'</td><td>'+numberWithCommas(amountPrice)+'</td><input type=\"hidden\" name=\"PriceDetail['+(iAdd-1)+'][id]\" value=\"'+id+'\" /><input type=\"hidden\" name=\"PriceDetail['+(iAdd-1)+'][price]\" value=\"'+amountPrice+'\" /></tr>');
+    $('#detail-addition').append(
+      `<tr>
+        <td scope=\"row\">\${iAdd+1}</td><td>\${text}</td>
+        <td>\${numberWithCommas(amountPrice)}</td>
+        <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][id]\" value=\"\${id}\" />
+        <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][price]\" value=\"\${amountPrice}\" />
+        <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][banksampah_name]\" value=\"\${text}\" />
+      </tr>`);
     iAdd++;
     $('#amount-price').val('');
   }else {

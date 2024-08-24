@@ -12,6 +12,7 @@ use app\models\ProdukUser;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\models\Mbanksampah;
 use stdClass;
 use yii\db\Query;
 
@@ -195,18 +196,33 @@ class JenissampahController extends MyController
                     
                     $dataArray = json_decode(json_encode($data), true);
                     $dataArray = $dataArray['vendors'];
-                    $isNew = true;
                     foreach ($postData as $itemPost) {
+                        $isNew = true;
                         foreach ($data->vendors as $i => $item) {
                             if ($itemPost['id'] == $item->vendorId) {
                                 $isNew = false;
+                                $bankSampah = Mbanksampah::findOne($itemPost['id']);
+                                $parentId = null;
+                                if ($bankSampah) {
+                                    $parentId = $bankSampah->parent_id;
+                                }   
+                                $isNew = false;
                                 $item->hargaPerKg = $itemPost['price'];
+                                $dataArray[$i]['vendorName'] = $itemPost['banksampah_name'];
+                                $dataArray[$i]['parentId'] = $parentId;
                                 $dataArray[$i]['hargaPerKg'] = $itemPost['price'];
                             }
                         }
                         if ($isNew) {
                             $obj = new stdClass();
+                            $parentId = null;
+                            $bankSampah = Mbanksampah::findOne($itemPost['id']);
+                            if ($bankSampah) {
+                                $parentId = $bankSampah->parent_id;
+                            }
                             $obj->vendorId = $itemPost['id'];
+                            $obj->vendorName = $itemPost['banksampah_name'];
+                            $obj->parentId = $parentId;
                             $obj->hargaPerKg = $itemPost['price'];
                             $data->vendors[] = $obj;
                         }
