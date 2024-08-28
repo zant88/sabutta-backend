@@ -63,7 +63,7 @@ class WithdrawSearch extends Withdraw
 
         if (!Yii::$app->user->can("admin")) {
             $user = User::findOne(Yii::$app->user->id);
-            $query->where(['banksampah_id' => $user->banksampah_id]);
+            $query->where(['withdraw.banksampah_id' => $user->banksampah_id]);
         }
 
         // grid filtering conditions
