@@ -90,10 +90,16 @@ if (Yii::$app->user->can('admin')) {
                   ?>
                 </div>
               </div>
-              <div class="col-lg-6">
+              <div class="col-lg-3">
                 <div class="form-group">
-                  <label>Harga per KG (Rp)</label>
+                  <label>Harga Beli per KG (Rp)</label>
                   <input type="number" id="amount-price" class="form-control">
+                </div>
+              </div>
+              <div class="col-lg-3">
+                <div class="form-group">
+                  <label>Harga Jual per KG (Rp)</label>
+                  <input type="number" id="amount-sold-price" class="form-control">
                 </div>
               </div>
             </div>
@@ -104,7 +110,8 @@ if (Yii::$app->user->can('admin')) {
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Vendor</th>
-                <th scope="col">Harga</th>
+                <th scope="col">Harga Beli</th>
+                <th scope="col">Harga Jual</th>
               </tr>
             </thead>
             <tbody id="detail-addition">
@@ -126,7 +133,8 @@ if (Yii::$app->user->can('admin')) {
           <tr>
             <th scope="col">#</th>
             <th scope="col">Bank Sampah</th>
-            <th scope="col">Harga</th>
+            <th scope="col">Harga Beli</th>
+            <th scope="col">Harga Jual</th>
             <!-- <th scope="col"></th> -->
           </tr>
           <?php 
@@ -134,7 +142,45 @@ if (Yii::$app->user->can('admin')) {
           $user = User::findOne(Yii::$app->user->id);
           $iCounter = 1;
           foreach ($data->vendors as $key => $item) {
-            if (property_exists($item, 'parentId')) {
+            if (Yii::$app->user->can('admin')) { 
+              ?>
+                <tr>
+                  <td scope="col"><?= $iCounter ?></td>
+                  <td scope="col"><?= property_exists($item, 'vendorName') ? $item->vendorName : $item->vendorId ?></td>
+                  <?php 
+                  if (property_exists($item, 'hargaPerKg')) {
+                    ?>
+                     <td scope="col"><?= $item->hargaPerKg ? number_format($item->hargaPerKg) : '-' ?></td>
+                    <?php
+                  }else if (property_exists($item, 'hargaBeli')) {
+                    ?>
+                    <td scope="col"><?= $item->hargaBeli ? number_format($item->hargaBeli) : '-' ?></td>
+                    <?php
+                  }else {
+                    ?>
+                    <td scope="col">-</td>
+                    <?php
+                  }
+                  ?>
+
+                  <?php 
+                  if (property_exists($item, 'hargaJual')) {
+                    ?>
+                    <td scope="col"><?= $item->hargaJual ? number_format($item->hargaJual) : '-' ?></td>
+                    <?php
+                  }else {
+                    ?>
+                    <td scope="col">-</td>
+                    <?php
+                  }
+                  ?>
+                 
+                  <!-- <td><a class="btn btn-sm btn-danger btn-round" href="javascript:void()">
+                    <i class="fa fa-trash" aria-hidden=""></i></a>
+                  </td> -->
+                </tr>
+              <?php
+            }else if (property_exists($item, 'parentId')) {
               if ($item->parentId == $user->banksampah_id) {
                 ?>
                 <tr>
@@ -185,12 +231,15 @@ function numberWithCommas(x) {
 }
 
 $('#btn-add').on('click', function(e){
-  var id = $('#user-selection').val();
+  var str_id = $('#user-selection').val();
+  var arr_id = str_id.split(' - ');
+  var id = arr_id[1];
   var amountPrice = $('#amount-price').val();
   var isAdding = true;
   var data = $('#user-selection').select2('data');
   var text = data[0].text;
   var amountPrice = $('#amount-price').val();
+  var amountSoldPrice = $('#amount-sold-price').val();
   
   userList.forEach(function(item){
     if (item.id == id) {
@@ -204,12 +253,15 @@ $('#btn-add').on('click', function(e){
       `<tr>
         <td scope=\"row\">\${iAdd+1}</td><td>\${text}</td>
         <td>\${numberWithCommas(amountPrice)}</td>
+        <td>\${numberWithCommas(amountSoldPrice)}</td>
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][id]\" value=\"\${id}\" />
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][price]\" value=\"\${amountPrice}\" />
+        <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][priceSold]\" value=\"\${amountSoldPrice}\" />
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][banksampah_name]\" value=\"\${text}\" />
       </tr>`);
     iAdd++;
     $('#amount-price').val('');
+    $('#amount-sold-price').val('');
   }else {
     Swal.fire({
       title: 'Error!',

@@ -55,8 +55,10 @@ class BanksampahController extends MyController
         if (!is_null($q)) {
             $query = new Query;
             if (Yii::$app->user->can('admin')) {
-                $query->select('id, full_name AS text')
-                    ->from('mbanksampah')
+                $query->select([
+                    "CONCAT(CAST(id AS CHAR), ' - ', CAST(banksampahid AS CHAR)) AS id", 
+                    "full_name AS text"
+                ])->from('mbanksampah')
                     ->where(['like', 'full_name', $q])
                     ->limit(20);
                 $command = $query->createCommand();
@@ -64,9 +66,13 @@ class BanksampahController extends MyController
                 $out['results'] = array_values($data);
             }else {
                 $user = User::findOne(Yii::$app->user->id);
-                $query->select('id, full_name AS text')
-                    ->from('mbanksampah')
-                    ->where("full_name like '%$q%' AND parent_id=$user->banksampah_id")
+                $query->select([
+                    "CONCAT(CAST(id AS CHAR), ' - ', CAST(banksampahid AS CHAR)) AS id", 
+                    "full_name AS text"
+                ])
+                ->from('mbanksampah')
+                    ->where(['like', 'full_name', $q])
+                    ->andWhere(['parent_id', $user->banksampah_id])
                     ->limit(20);
                 $command = $query->createCommand();
                 $data = $command->queryAll();

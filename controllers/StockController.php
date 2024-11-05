@@ -134,6 +134,10 @@ class StockController extends MyController
         }
     }
 
+    public function actionSell() {
+        return  $this->render('sale');
+    }
+
     /**
      * Deletes an existing Stock model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

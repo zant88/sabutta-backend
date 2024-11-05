@@ -94,7 +94,10 @@ class AdminController extends MyController
 
         $post = Yii::$app->request->post();
         $userLoaded = $user->load($post);
-        $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
+        echo '<pre>';
+        print_r($user);
+        die;
+        // $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         if (!Yii::$app->user->can('admin')) {
             $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         }

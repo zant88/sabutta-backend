@@ -122,7 +122,7 @@ class SalesController extends MyController
         \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
         $out = ['results' => ['id' => '', 'text' => '']];
         $query = new Query;
-        if (Yii::$app->user->can('admn')) {
+        if (Yii::$app->user->can('admin')) {
             $strWhere = "idorder LIKE '%".$q."%'";
         }else {
             $user = User::findOne(Yii::$app->user->id);

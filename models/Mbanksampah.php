@@ -81,4 +81,21 @@ class Mbanksampah extends \yii\db\ActiveRecord
         }
         return $dropdown;
     }
+
+    /**
+     * Get list of roles for creating dropdowns
+     * @return array
+     */
+    public static function dropdownCode()
+    {
+        // get all records from database and generate
+        static $dropdown;
+        if ($dropdown === null) {
+            $models = static::find()->all();
+            foreach ($models as $model) {
+                $dropdown[$model->banksampahid] = $model->banksampahid." - ".$model->full_name;
+            }
+        }
+        return $dropdown;
+    }
 }

@@ -2,6 +2,7 @@
 
 $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
+$dbProxy = require __DIR__ . '/db_proxy.php';
 
 $config = [
     'id' => 'sabutta',
@@ -54,6 +55,7 @@ $config = [
             ],
         ],
         'db' => $db,
+        'dbProxy' => $dbProxy,
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,

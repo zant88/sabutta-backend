@@ -22,7 +22,11 @@ if (Yii::$app->user->can("admin")) {
     $gridColumns = [
         ['class' => 'yii\grid\SerialColumn'],
         'userid',
-        'owner',
+        'banksampah_code',
+        // [
+        //     'attribute' => 'owner',
+
+        // ]
         'namafas',
         'nip',
         'nik',

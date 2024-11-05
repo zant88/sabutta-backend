@@ -118,6 +118,49 @@ class StockSearch extends Stock
      *
      * @return ActiveDataProvider
      */
+    public function searchStock($params)
+    {
+        $query = Stock::find();
+
+        // add conditions that should always apply here
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+        ]);
+
+        $this->load($params);
+
+        if (!$this->validate()) {
+            // uncomment the following line if you do not want to return any records when validation fails
+            // $query->where('0=1');
+            return $dataProvider;
+        }
+
+        // grid filtering conditions
+        $query->where([
+            'status' => 'AKTIF'
+        ]);
+
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
+        }
+        $query->andFilterWhere(['like', 'idsampah', $this->idsampah])
+            ->andFilterWhere(['like', 'nama', $this->nama])
+            ->andFilterWhere(['like', 'desc', $this->desc])
+            ->andFilterWhere(['like', 'status', $this->status])
+            ->andFilterWhere(['like', 'roleuser', $this->roleuser]);
+
+        return $dataProvider;
+    }
+
+    /**
+     * Creates data provider instance with search query applied
+     *
+     * @param array $params
+     *
+     * @return ActiveDataProvider
+     */
     public function searchWeight($params)
     {
         $query = Stock::find();

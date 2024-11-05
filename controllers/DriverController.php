@@ -11,6 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\models\Usermap;
 use app\modules\user\models\User;
 
 /**
@@ -93,15 +94,38 @@ class DriverController extends MyController
                 $model->userid = $model->iddriver;
                 $model->pass = md5('enviro');
                 $user = User::findOne(Yii::$app->user->id);
-                $model->nmperusahaan = $user->banksampah_code;
+                if (!Yii::$app->user->can("admin")) {
+                    $model->nmperusahaan = $user->banksampah_code;
+                }else {
+                    $model->nmperusahaan = explode(" - ", $model->nmperusahaan)[0];
+                }
+                
                 $model->role = '0102';
                 if ($model->validate()) {
                     $apps->value = (string) ($currValue + 1);
                     if ($apps->validate()  && $apps->save()) {
                         $model->save();
-                        Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
-                        return $this->redirect(['index']);
+                        $milliseconds = round(microtime(true) * 1000);
+                        $userMap = new Usermap();
+                        $userMap->idmap = (string) $milliseconds;
+                        $userMap->userid = $model->userid;
+                        $userMap->pwd = $model->pass;
+                        $userMap->idbank = $model->nmperusahaan;
+                        $userMap->tglinput = date('Y-m-d H:i:s');
+                        $userMap->status = 0;
+                        if ($userMap->validate() && $userMap->save()) {
+                            Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                            return $this->redirect(['index']);
+                        }else {
+                            echo '<pre>';
+                            print_r($userMap->errors);
+                            die;
+                        }
                     }
+                }else {
+                    echo '<pre>';
+                    print_r($model->errors);
+                    die;
                 }
             }else {
                 Yii::$app->session->setFlash('error', "Data gagal disimpan! Tidak ada konfigurasi apps");

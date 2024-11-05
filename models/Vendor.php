@@ -13,6 +13,7 @@ use Yii;
  * @property string|null $description
  * @property int|null $status
  * @property string|null $phone
+ * @property float|null $percentage_profit
  *
  * @property Sales[] $sales
  * @property VendorWaste[] $vendorWastes
@@ -35,6 +36,7 @@ class Vendor extends \yii\db\ActiveRecord
         return [
             [['address', 'description'], 'string'],
             [['status'], 'integer'],
+            [['percentage_profit'], 'number', 'min' => 0, 'max' => 100],
             [['name'], 'string', 'max' => 255],
             [['phone'], 'string', 'max' => 35],
         ];
@@ -52,6 +54,7 @@ class Vendor extends \yii\db\ActiveRecord
             'description' => Yii::t('app', 'Description'),
             'status' => Yii::t('app', 'Status'),
             'phone' => Yii::t('app', 'Phone'),
+            'percentage_profit' => Yii::t('app', 'Phone'),
         ];
     }
 

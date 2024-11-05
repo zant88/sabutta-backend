@@ -22,6 +22,13 @@ AppAsset::register($this);
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <?= Html::csrfMetaTags() ?>
   <title><?= Html::encode($this->title) ?></title>
+  <?php 
+  if ($this->blocks) {
+    if (array_key_exists('css', $this->blocks)) {
+      echo $this->blocks['css'];
+    }
+  }
+  ?>
   <?php $this->head() ?>
 </head>
 
@@ -89,8 +96,11 @@ AppAsset::register($this);
   </div>
   <?php 
   if ($this->blocks) {
-    if ($this->blocks['modal']) {
+    if (array_key_exists('modal', $this->blocks)) {
       echo $this->blocks['modal'];
+    }
+    if (array_key_exists('scripts', $this->blocks)) {
+      echo $this->blocks['scripts'];
     }
   }
   ?>

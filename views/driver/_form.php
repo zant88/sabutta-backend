@@ -20,6 +20,15 @@ use yii\widgets\ActiveForm;
             <?= $form->field($model, 'telpdriver')->textInput(['maxlength' => true, 'placeholder' => '0821xx']) ?>
         </div>
         <?php 
+        if (Yii::$app->user->can("admin")) {
+            ?>
+        <div class="col-lg-6">
+            <?= $form->field($model, 'nmperusahaan')->dropDownList($bs_list); ?>
+        </div>
+            <?php
+        }
+        ?>
+        <?php 
         if ($model->isNewRecord) {
             ?>
         <div class="col-lg-6">

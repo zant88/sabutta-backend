@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property int $vendor_id
+ * @property int $banksampah_sales_id
+ * @property int $banksampah_id
  * @property string $code
  * @property string $sales_date
  * @property int $total
@@ -41,7 +43,7 @@ class Sales extends \yii\db\ActiveRecord
     {
         return [
             [['vendor_id', 'code', 'sales_date', 'total'], 'required'],
-            [['vendor_id', 'total', 'invoiced'], 'integer'],
+            [['vendor_id', 'total', 'invoiced', 'banksampah_id', 'banksampah_sales_id'], 'integer'],
             [['sales_date', 'generated_date_surat_jalan'], 'safe'],
             [['description'], 'string'],
             [['code', 'status'], 'string', 'max' => 255],

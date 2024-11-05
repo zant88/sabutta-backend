@@ -2,10 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Mbanksampah;
+use app\models\Orderdetail;
 use Yii;
 use app\models\OrderRevision;
 use app\models\OrderRevisionDetail;
 use app\models\OrderRevisionSearch;
+use app\modules\user\models\User;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -81,6 +84,17 @@ class OrderRevisionController extends Controller
             try {
                 $model->code = $this->generateRevisionCode();
                 $model->revision_date = $model->revision_date." ".date('H:i:s');
+                if (Yii::$app->user->can('admin')) {
+                    $banksampah = Mbanksampah::findOne($_POST['OrderRevision']['banksampah_id']);
+                    if ($banksampah) {
+                        $model->banksampah_id =  $_POST['OrderRevision']['banksampah_id'];
+                        $model->banksampah_code = $banksampah->banksampahid;
+                    }
+                }else {
+                    $user = User::findOne(Yii::$app->user->id);
+                    $model->banksampah_id =  $user->banksampah_id;
+                    $model->banksampah_code = $user->banksampah_code;
+                }
                 $detRet = true;
                 if ($model->save()) {
                     $postData = $_POST['RevisionDetail'];
@@ -89,6 +103,16 @@ class OrderRevisionController extends Controller
                         $modelDetail->order_revision_id = $model->id;
                         $modelDetail->sampah_id = $item['idsampah'];
                         $modelDetail->amount_diminished = $item['berat'];
+                        $orderDetail = Orderdetail::find()->where([
+                            'orderid' => $model->order_id,
+                            'idsampah' => $item['idsampah']
+                        ])->one();
+                        if ($orderDetail) {
+                            $unitPrice = $orderDetail->harga / $orderDetail->berat;
+                            $orderDetail->berat = $orderDetail->berat - $item['berat'];
+                            $orderDetail->harga = $unitPrice * $orderDetail->berat;
+                            $orderDetail->save();
+                        }
                         if ($modelDetail->save()) {
                             $detRet = $detRet && true;
                         }else {

@@ -210,7 +210,8 @@ class JenissampahController extends MyController
                                 $item->hargaPerKg = $itemPost['price'];
                                 $dataArray[$i]['vendorName'] = $itemPost['banksampah_name'];
                                 $dataArray[$i]['parentId'] = $parentId;
-                                $dataArray[$i]['hargaPerKg'] = $itemPost['price'];
+                                $dataArray[$i]['hargaBeli'] = $itemPost['price'];
+                                $dataArray[$i]['hargaJual'] = $itemPost['priceSold'];
                             }
                         }
                         if ($isNew) {
@@ -223,18 +224,24 @@ class JenissampahController extends MyController
                             $obj->vendorId = $itemPost['id'];
                             $obj->vendorName = $itemPost['banksampah_name'];
                             $obj->parentId = $parentId;
-                            $obj->hargaPerKg = $itemPost['price'];
+                            $obj->hargaBeli = $itemPost['price'];
+                            $obj->hargaJual = $itemPost['priceSold'];
                             $data->vendors[] = $obj;
                         }
                     }
-                    
                     $model->json = json_encode($data);
                 }
                 if ($detRet) {
-                    $model->save();
-                    $transaction->commit();
-                    Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
-                    return $this->redirect(['index']);
+                    if ($model->validate() && $model->save() ) {
+                        $transaction->commit();
+                        Yii::$app->session->setFlash('success', "Data telah berhasil disimpan!");
+                        return $this->redirect(['index']);
+                    }else {
+                        echo '<pre>';
+                        print_r($model->errors);
+                        die;
+                    }
+                    
                 }else {
                     $transaction->rollBack();
                 }

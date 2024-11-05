@@ -1,7 +1,7 @@
 <?php
 
 use yii\helpers\Html;
-
+use app\models\Mbanksampah;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Driver */
@@ -21,6 +21,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     <?= $this->render('_form', [
                         'model' => $model,
                         'mrole' => $mrole,
+                        'bs_list' => Mbanksampah::dropdownCode(),
                     ]) ?>
                 </div>
             </div>
