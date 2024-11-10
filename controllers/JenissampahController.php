@@ -13,6 +13,7 @@ use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
 use app\models\Mbanksampah;
+use app\modules\user\models\User;
 use stdClass;
 use yii\db\Query;
 
@@ -182,9 +183,26 @@ class JenissampahController extends MyController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $hargaDiterima = 0;
+        if ($model->json) {
+            $data = json_decode($model->json);        
+            $dataArray = json_decode(json_encode($data), true);
+            $dataArray = $dataArray['vendors'];
+            $user = User::findOne(Yii::$app->user->id); 
+            foreach ($dataArray as $itemSampah) {
+                if ($user->banksampah_code = $itemSampah['vendorId']) {
+                    if (!Yii::$app->request->isPost) {
+                        $model->hargaBS = $itemSampah['hargaBeli'];
+                    }
+                   
+                    $hargaDiterima = $itemSampah['hargaJual'];
+                }
+            }
+            
+        }
         $mrole = Mrole::find()->asArray()->all();
         $productUser = ProdukUser::find()->where(['idsampah' => $id])->all();
-
+        // $originPrice = $model->hargaperkg;
         if ($model->load(Yii::$app->request->post())) {
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
@@ -207,7 +225,7 @@ class JenissampahController extends MyController
                                     $parentId = $bankSampah->parent_id;
                                 }   
                                 $isNew = false;
-                                $item->hargaPerKg = $itemPost['price'];
+                                // $item->hargaPerKg = $itemPost['price'];
                                 $dataArray[$i]['vendorName'] = $itemPost['banksampah_name'];
                                 $dataArray[$i]['parentId'] = $parentId;
                                 $dataArray[$i]['hargaBeli'] = $itemPost['price'];
@@ -229,7 +247,57 @@ class JenissampahController extends MyController
                             $data->vendors[] = $obj;
                         }
                     }
-                    $model->json = json_encode($data);
+                    $model->json = json_encode([
+                        'vendors' => $dataArray
+                    ]);
+                }
+
+                if (!Yii::$app->user->can('admin')) {
+                    $detRet = true;
+                    if ($model->json) {
+                        $data = json_decode($model->json);        
+                        $dataArray = json_decode(json_encode($data), true);
+                        $dataArray = $dataArray['vendors'];
+                        $user = User::findOne(Yii::$app->user->id); 
+                        foreach ($dataArray as $j => $itemSampah) {
+                            $isNew = true;
+                            if ($user->banksampah_code = $itemSampah['vendorId']) {
+                                $isNew = false;
+                                $bankSampah = Mbanksampah::find()->where([
+                                    'banksampahid' => $user->banksampah_code
+                                ])->one();
+                                $vendorName = "";
+                                if ($bankSampah) {
+                                    $vendorName = $bankSampah->full_name;
+                                }   
+                                $isNew = false;
+                                // $itemSampah->hargaPerKg = $model->hargaperkg;
+                                $dataArray[$j]['vendorName'] = $vendorName;
+                                $dataArray[$j]['hargaBeli'] = $_POST['Jenissampah']['hargaBS'];
+                                $dataArray[$j]['hargaJual'] = $itemSampah['hargaJual'];
+                            }
+                        }
+
+                        if ($isNew) {
+                            $obj = new stdClass();
+                            $parentId = null;
+                            $bankSampah = Mbanksampah::find()->where([
+                                'banksampahid' => $user->banksampah_code
+                            ])->one();
+                            if ($bankSampah) {
+                                $parentId = $bankSampah->parent_id;
+                            }
+                            $obj->vendorId = $bankSampah->id;
+                            $obj->vendorName = $bankSampah->full_name;
+                            $obj->hargaBeli = $model->hargaBS;
+                            $obj->hargaJual = $model->hargaBS;
+                            $data->vendors[] = $obj;
+                        }
+
+                        $model->json = json_encode([
+                            'vendors' => $dataArray
+                        ]);
+                    }
                 }
                 if ($detRet) {
                     if ($model->validate() && $model->save() ) {
@@ -260,7 +328,8 @@ class JenissampahController extends MyController
             return $this->render('update', [
                 'model' => $model,
                 'mrole' => $mrole,
-                'produkUser' => $productUser
+                'produkUser' => $productUser,
+                'hargaDiterima' => $hargaDiterima
             ]);
         }
     }

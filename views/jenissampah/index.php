@@ -5,11 +5,38 @@ use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
 use kartik\export\ExportMenu;
+use app\modules\user\models\User;
 
 $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
     'nama',
-    'hargaperkg',
+    // 'hargaperkg',
+    // [
+    //     'label' => 'Harga Default',
+    //     'attribute' => 'hargaperkg',
+    // ],
+    [
+        'format' => 'raw',
+        'label' => 'Harga',
+        'value' => function ($model) {
+            $price = 0;
+            $data = json_decode($model->json);        
+            $dataArray = json_decode(json_encode($data), true);
+            $dataArray = $dataArray['vendors'];
+            if (Yii::$app->user->can('admin')) {
+                return $model->hargaperkg;
+            }else {
+                $user = User::findOne(Yii::$app->user->id); 
+                foreach ($dataArray as $j => $itemSampah) {
+                    if ($itemSampah['vendorId'] == $user->banksampah_code) {
+                        $price = $itemSampah['hargaBeli'];
+                    }
+                }
+                return $price;
+            }
+            
+        }
+    ],
     'desc',
     [
         'attribute' => 'status',

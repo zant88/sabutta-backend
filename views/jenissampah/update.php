@@ -12,7 +12,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model app\models\Jenissampah */
 
-$this->title = Yii::t('app', 'Update {modelClass}: ', [
+$this->title = Yii::t('app', 'Update Sampah: ', [
   'modelClass' => 'Jenissampah',
 ]) . $model->idsampah;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Sampah'), 'url' => ['index']];
@@ -47,7 +47,9 @@ if (Yii::$app->user->can('admin')) {
           <?= $this->render('_formUpdate', [
             'model' => $model,
             'mrole' => $mrole,
-            'form' => $form
+            'form' => $form,
+            'hargaDiterima' => $hargaDiterima,
+            'canConfigureBankSampahPrice' => $canConfigureBankSampahPrice
           ]) ?>
         </div>
       </div>
@@ -126,6 +128,9 @@ if (Yii::$app->user->can('admin')) {
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
       </div>
     </div>
+    <?php 
+    if ($canConfigureBankSampahPrice) {
+      ?>
     <div class="col-lg-4">
       <h5>Detail</h5>
       <table class="table">
@@ -201,8 +206,11 @@ if (Yii::$app->user->can('admin')) {
         <tbody id="detail">
         </tbody>
       </table>
-      
-    </div>
+    </div>  
+      <?php
+    }
+    ?>
+    
   </div>
 </div>
 <?php ActiveForm::end(); ?>

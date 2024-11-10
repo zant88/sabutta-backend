@@ -17,6 +17,8 @@ use Yii;
  */
 class Jenissampah extends \yii\db\ActiveRecord
 {
+
+    public $hargaBS;
     /**
      * {@inheritdoc}
      */

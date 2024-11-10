@@ -23,10 +23,33 @@ use kartik\select2\Select2;
       <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
     </div>
     <div class="col-lg-6">
+    <?php 
+      if ($canConfigureBankSampahPrice){
+      ?>
       <?= $form->field($model, 'hargaperkg')->textInput() ?>
+      <?php
+      }else {
+        ?>
+        <?= $form->field($model, 'hargaBS')->textInput() ?>
+        <?php
+      }?>
+      
     </div>
     <div class="col-lg-6">
-      <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
+      <?php 
+      if ($canConfigureBankSampahPrice){
+        ?>
+        <?= $form->field($model, 'desc')->textInput(['maxlength' => true]) ?>
+        <?php
+      }else {
+        ?>
+        <div class="form-group field-jenissampah-hargaperkg has-success">
+          <label class="control-label" for="jenissampah-hargaperkg">Harga per KG</label>
+          <input type="text" id="jenissampah-hargaperkg" class="form-control" disabled name="Jenissampah[hargaBS]" value="<?= $hargaDiterima ?>" aria-invalid="false">
+        </div>
+        <?php
+      }
+      ?>
     </div>
     <div class="col-lg-6">
       <?= $form->field($model, 'status')
