@@ -59,9 +59,8 @@ class FasyankesUserSearch extends FasyankesUser
         }
 
         if (!Yii::$app->user->can("admin")) {
-            
             $user = User::findOne(Yii::$app->user->id);
-            $query->where(['banksampah_code' => $user->banksampah_code]);
+            $query->where(['banksampah_id' => $user->banksampah_id]);
         }
 
         // grid filtering conditions
