@@ -11,6 +11,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\models\Mbanksampah;
 use app\models\Usermap;
 use app\modules\user\models\User;
 
@@ -31,16 +32,16 @@ class DriverController extends MyController
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => \yii\filters\AccessControl::class,
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['index', 'view', 'create', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
-                ],
-            ],
+            // 'access' => [
+            //     'class' => \yii\filters\AccessControl::class,
+            //     'rules' => [
+            //         [
+            //             'allow' => true,
+            //             'actions' => ['index', 'view', 'create', 'update', 'delete'],
+            //             'roles' => ['@'],
+            //         ],
+            //     ],
+            // ],
         ];
     }
 
@@ -95,6 +96,11 @@ class DriverController extends MyController
                 $model->pass = md5('enviro');
                 $user = User::findOne(Yii::$app->user->id);
                 if (!Yii::$app->user->can("admin")) {
+                    if (!$user->banksampah_code) {
+                        $bankSampah = Mbanksampah::findOne($user->banksampah_id);
+                        $user->banksampah_code = $bankSampah->banksampahid;
+                        $user->save();
+                    }
                     $model->nmperusahaan = $user->banksampah_code;
                 }else {
                     $model->nmperusahaan = explode(" - ", $model->nmperusahaan)[0];

@@ -184,25 +184,25 @@ class JenissampahController extends MyController
     {
         $model = $this->findModel($id);
         $hargaDiterima = 0;
+        $user = User::findOne(Yii::$app->user->id); 
+        $userBSCode = $user->banksampah_code;
         if ($model->json) {
             $data = json_decode($model->json);        
             $dataArray = json_decode(json_encode($data), true);
             $dataArray = $dataArray['vendors'];
-            $user = User::findOne(Yii::$app->user->id); 
+            
             foreach ($dataArray as $itemSampah) {
-                if ($user->banksampah_code = $itemSampah['vendorId']) {
+                
+                if ($userBSCode == $itemSampah['vendorId']) {
                     if (!Yii::$app->request->isPost) {
                         $model->hargaBS = $itemSampah['hargaBeli'];
                     }
-                   
                     $hargaDiterima = $itemSampah['hargaJual'];
                 }
             }
-            
         }
         $mrole = Mrole::find()->asArray()->all();
         $productUser = ProdukUser::find()->where(['idsampah' => $id])->all();
-        // $originPrice = $model->hargaperkg;
         if ($model->load(Yii::$app->request->post())) {
             $connection = \Yii::$app->db;
             $transaction = $connection->beginTransaction();
@@ -254,14 +254,14 @@ class JenissampahController extends MyController
 
                 if (!Yii::$app->user->can('admin')) {
                     $detRet = true;
+                    $isNew = true;
                     if ($model->json) {
                         $data = json_decode($model->json);        
                         $dataArray = json_decode(json_encode($data), true);
                         $dataArray = $dataArray['vendors'];
                         $user = User::findOne(Yii::$app->user->id); 
                         foreach ($dataArray as $j => $itemSampah) {
-                            $isNew = true;
-                            if ($user->banksampah_code = $itemSampah['vendorId']) {
+                            if ($userBSCode == $itemSampah['vendorId']) {
                                 $isNew = false;
                                 $bankSampah = Mbanksampah::find()->where([
                                     'banksampahid' => $user->banksampah_code
@@ -277,21 +277,20 @@ class JenissampahController extends MyController
                                 $dataArray[$j]['hargaJual'] = $itemSampah['hargaJual'];
                             }
                         }
-
                         if ($isNew) {
+                            $n = sizeof($dataArray);
                             $obj = new stdClass();
                             $parentId = null;
                             $bankSampah = Mbanksampah::find()->where([
-                                'banksampahid' => $user->banksampah_code
+                                'banksampahid' => $userBSCode
                             ])->one();
                             if ($bankSampah) {
                                 $parentId = $bankSampah->parent_id;
                             }
-                            $obj->vendorId = $bankSampah->id;
-                            $obj->vendorName = $bankSampah->full_name;
-                            $obj->hargaBeli = $model->hargaBS;
-                            $obj->hargaJual = $model->hargaBS;
-                            $data->vendors[] = $obj;
+                            $dataArray[$n]['vendorName'] = $bankSampah->full_name;
+                            $dataArray[$n]['vendorId'] = $bankSampah->banksampahid;
+                            $dataArray[$n]['hargaBeli'] = $_POST['Jenissampah']['hargaBS'];
+                            $dataArray[$n]['hargaJual'] = $_POST['Jenissampah']['hargaBS'];
                         }
 
                         $model->json = json_encode([
@@ -319,12 +318,7 @@ class JenissampahController extends MyController
                 die;
                 $transaction->rollback();
             }
-            
-            // return $this->redirect(['view', 'id' => $model->idsampah]);
         } else {
-            // echo '<pre>';
-            // print_r($model->json);
-            // die;
             return $this->render('update', [
                 'model' => $model,
                 'mrole' => $mrole,

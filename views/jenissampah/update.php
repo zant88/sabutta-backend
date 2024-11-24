@@ -16,7 +16,9 @@ $this->title = Yii::t('app', 'Update Sampah: ', [
   'modelClass' => 'Jenissampah',
 ]) . $model->idsampah;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Sampah'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->idsampah, 'url' => ['view', 'id' => $model->idsampah]];
+if (Yii::$app->user->can('admin')) {
+  $this->params['breadcrumbs'][] = ['label' => $model->idsampah, 'url' => ['view', 'id' => $model->idsampah]];
+}
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 
 // $url = \yii\helpers\Url::to(['fasyankes-user/fasyankes-list']);

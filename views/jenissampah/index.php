@@ -43,7 +43,7 @@ $gridColumns = [
         'headerOptions' => ['style' => 'width:150px'],
     ],
     // 'roleuser',
-    ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {view} {delete}'],
+    ['class' => 'app\widgets\grid\ActionColumn', 'template' => Yii::$app->user->can('admin') ? '{update} {view} {delete}' : '{update}'],
 ];
 
 $gridColumnsExport = [

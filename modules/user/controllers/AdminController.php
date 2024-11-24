@@ -94,11 +94,7 @@ class AdminController extends MyController
 
         $post = Yii::$app->request->post();
         $userLoaded = $user->load($post);
-        echo '<pre>';
-        print_r($user);
-        die;
-        // $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
-        if (!Yii::$app->user->can('admin')) {
+        if (Yii::$app->user->can('admin')) {
             $user->banksampah_code = Mbanksampah::findOne($user->banksampah_id)->banksampahid;
         }
         $profile->load($post);
@@ -113,10 +109,6 @@ class AdminController extends MyController
             $user->save(false);
             $profile->setUser($user->id)->save(false);
             return $this->redirect(['view', 'id' => $user->id]);
-        }else {
-            echo '<pre>';
-            print_r($user->getErrors());
-            die;
         }
 
         // render

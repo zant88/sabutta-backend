@@ -44,7 +44,7 @@ use kartik\select2\Select2;
       }else {
         ?>
         <div class="form-group field-jenissampah-hargaperkg has-success">
-          <label class="control-label" for="jenissampah-hargaperkg">Harga per KG</label>
+          <label class="control-label" for="jenissampah-hargaperkg">Harga Diterima</label>
           <input type="text" id="jenissampah-hargaperkg" class="form-control" disabled name="Jenissampah[hargaBS]" value="<?= $hargaDiterima ?>" aria-invalid="false">
         </div>
         <?php
