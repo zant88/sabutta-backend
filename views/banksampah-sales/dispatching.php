@@ -1,4 +1,6 @@
-<?php
+<?php 
+
+?><?php
 
 use app\models\Jenissampah;
 use app\models\Mbanksampah;
@@ -9,12 +11,10 @@ use yii\widgets\DetailView;
 /* @var $model app\models\BanksampahSales */
 
 $this->title = $model->code;
-$this->params['breadcrumbs'][] = ['label' => 'Daftar Banksampah Sales', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Pengiriman Sampah', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<?php 
-if (Yii::$app->user->can('admin')) {
-  ?>
+
 <div class="banksampah-sales-view">
   <div class="row">
     <div class="col-lg-8">
@@ -55,6 +55,9 @@ if (Yii::$app->user->can('admin')) {
         </div>
       </div>
     </div>
+    <?php 
+    if (Yii::$app->user->can('admin')) {
+?>
     <div class="col-lg-4">
       <div class="card">
         <div class="card-header">
@@ -88,6 +91,10 @@ if (Yii::$app->user->can('admin')) {
         <a href="javascript:void(0)" v-if="is_calculate" @click="submitSales" class="btn btn-primary">Submit</a>
       </div>
     </div>
+<?php
+    }
+    ?>
+    
     <div class="col-lg-8">
       <div class="card">
         <div class="card-header">
@@ -101,17 +108,13 @@ if (Yii::$app->user->can('admin')) {
                   <th>Sampah</th>
                   <th>Qty (Kg)</th>
                   <th>Harga Beli</th>
-                  <th>Harga Jual</th>
                   <th>Total Beli (Rp.)</th>
-                  <th>Total Jual (Rp.)</th>
                 </tr>
                 <tr v-for="item in detail_list" :>
                   <td>{{ item.nama }}</td>
                   <td>{{ formatNumber(item.quantity) }}</td>
                   <td>{{ formatNumber(item.purchase_price) }}</td>
-                  <td>{{ formatNumber(item.selling_price) }}</td>
                   <td>{{ formatNumber(item.purchase_total) }}</td>
-                  <td>{{ formatNumber(item.selling_total) }}</td>
                 </tr>
               </tbody>
             </table>
@@ -120,14 +123,7 @@ if (Yii::$app->user->can('admin')) {
       </div>
     </div>
   </div>
-</div>  
-  <?php
-}else {
-  ?>
-  <h3>Hanya admin yang bisa akses halaman ini!</h3>
-  <?php
-}
-?>
+</div>
 
 
 
@@ -213,7 +209,7 @@ if (Yii::$app->user->can('admin')) {
                 if (response.data.success == true) {
                   Swal.fire({
                     title: 'Sukses!',
-                    text: 'Data telah berhasil disimpan!',
+                    text: 'Sampah telah berhasil dikirim!',
                     icon: 'success',
                     confirmButtonText: 'Ok'
                   }).then(() => {

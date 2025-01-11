@@ -156,6 +156,19 @@ class FasyankesUserController extends MyController
         }
     }
 
+    public function actionUpdateSaldo($id) {
+        $model = $this->findModel($id);
+
+        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+            Yii::$app->session->setFlash('success', "Saldo telah berhasil diupdate!");
+            return $this->redirect(['index']);
+        } else {
+            return $this->render('update-saldo', [
+                'model' => $model,
+            ]);
+        }
+    }
+
     /**
      * Deletes an existing FasyankesUser model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

@@ -89,7 +89,7 @@ class StockSearch extends Stock
         }
         if (!Yii::$app->user->can("admin")) {
             $user = User::findOne(Yii::$app->user->id);
-            $query->where(['banksampah_id' => $user->banksampah_id]);
+            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
         }
         $query->andFilterWhere([
             'nilai' => $this->nilai,

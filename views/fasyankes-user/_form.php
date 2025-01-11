@@ -13,6 +13,11 @@ use  yii\web\View;
 
     <?php $form = ActiveForm::begin(['id'=>'form-user']); ?>
         <?= $form->errorSummary($model) ?> <!-- ADDED HERE -->
+        <?php 
+            // echo '<pre>';
+            // print_r($model->idfas);
+            // die;
+        ?>
         <div class="row">
             <div class="col-lg-6">
                 <?= $form->field($model, 'idfas')->textInput(['maxlength' => true]) ?>
@@ -39,7 +44,8 @@ use  yii\web\View;
 
     <div class="form-group">
         <?= Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success']) ?>
-        <a href="javascript:void(0)" id="btn-submit" class="btn btn-primary">Save and New</a>
+        <a class="btn btn-secondary" href="/fasyankes-user/update-saldo?id=<?= $model->idfas ?>">Update Saldo</a>
+        <!-- <a href="javascript:void(0)" id="btn-submit" class="btn btn-primary">Save and New</a> -->
     </div>
 
     <?php ActiveForm::end(); ?>

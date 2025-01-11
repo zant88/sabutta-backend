@@ -15,7 +15,7 @@ return [
         'kas_keluar' => 'KAS KELUAR'
     ],
     'print_copy' => [
-        'Perusahaan', 'Vendor'
+        'Vendor'
     ],
     'report_password' => 'Sabuta!'
 ];

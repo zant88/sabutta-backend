@@ -66,5 +66,70 @@ $gridColumns = [
   <div class="col-lg-8">
     <?= Html::a(Yii::t('app', 'Buat/Edit Surat Jalan'), ['surat-jalan', 'id' => $model->id], ['class' => 'btn btn-success mr-2']) ?>
     <?= Html::a(Yii::t('app', 'Print Invoice'), ['print-surat-jalan', 'id' => $model->id], ['class' => 'btn btn-primary mr-2']) ?>
+    <?php 
+    if (!Yii::$app->user->can('admin')) {
+      ?>
+      <a href="javascript:void(0)" @click="dispatchWaste" class="btn btn-dark">Sampah Diangkut?</a>
+      <?php 
+    }
+    ?>
+    
   </div>
 </div>
+
+<?php $this->beginBlock('scripts') ?>
+<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.2/dist/sweetalert2.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  const {
+    createApp,
+    ref,
+    toRaw
+  } = Vue;
+
+  createApp({
+    data() {
+      return {
+        phone: '',
+        vendor_id: '',
+        detail_list: [],
+        vendor_comp: '',
+        is_calculate: false,
+      }
+    },
+    methods: {
+      dispatchWaste() {
+        Swal.fire({
+          icon: 'question',
+          title: 'Anda yakin akan melakukan proses pengangkutan sampah? Dengan menekan tombol ya, maka stok otomatis akan berkurang!',
+          showCancelButton: true,
+          confirmButtonText: 'Yes',
+        }).then((result) => {
+          if (result.isConfirmed) {
+            const formData = new FormData();
+            formData.append('id', <?= $model->id ?>);
+            var csrfToken = $('meta[name="csrf-token"]').attr("content");
+            formData.append('_csrf', csrfToken);
+            axios.post('/banksampah-sales/dispatch-waste/', formData).then(response => {
+              console.log(response.data);
+              if (response.data.success == true) {
+                Swal.fire({
+                  title: 'Sukses!',
+                  text: 'Sampah telah berhasil dikirim ke vendor!',
+                  icon: 'success',
+                  confirmButtonText: 'Ok'
+                }).then(() => {
+                  window.location.href = '/banksampah-sales/';
+                });
+              }
+            });
+          }
+        });
+      },
+    },
+  }).mount('#app');
+</script>
+
+<?php $this->endBlock() ?>

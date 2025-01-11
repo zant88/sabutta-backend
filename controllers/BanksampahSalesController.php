@@ -10,6 +10,7 @@ use app\models\Stock;
 use app\models\BanksampahSalesDetail;
 use app\models\BanksampahSalesSearch;
 use app\models\Jenissampah;
+use app\models\Mbanksampah;
 use app\models\Vendor;
 use app\models\VendorWaste;
 use yii\web\Controller;
@@ -78,11 +79,37 @@ class BanksampahSalesController extends Controller
                 'selling_total' => 0
             ];
         }
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-            'detailList' => $detailList,
-            'vendorList' => $vendorList,
-        ]);
+        
+        if (Yii::$app->user->can('admin')) {
+            $sales = Sales::find()->where([
+                'banksampah_sales_id' => $id
+            ])->one();
+            if ($sales) {
+                if ($sales->surat_jalan_code) {
+                    return $this->redirect(['sales/view', 
+                        'id' => $sales->id
+                    ]);
+                }else {
+                    return $this->redirect(['/sales/surat-jalan', 
+                        'id' => $sales->id
+                    ]);
+                }
+            }else {
+                return $this->render('view', [
+                    'model' => $this->findModel($id),
+                    'detailList' => $detailList,
+                    'vendorList' => $vendorList,
+                ]);
+            }
+        }else {
+            return $this->render('dispatching', [
+                'model' => $this->findModel($id),
+                'detailList' => $detailList,
+                'vendorList' => $vendorList,
+            ]);
+            
+        }
+        
     }
 
     /**
@@ -159,13 +186,18 @@ class BanksampahSalesController extends Controller
                         ];
                     }else {
                         $purchaseTotal = $item->quantity * $item->unit_price;
-                        $sellingTotal = 0;
+                        $vendor = Vendor::findOne($vendor_id);
+                        $sellingPrice = 0;
+                        if ($vendor) {
+                            $sellingPrice = $vendor->percentage_profit * $item->unit_price / 100 + $item->unit_price;
+                        }
+                        $sellingTotal = $sellingPrice * $item->quantity;
                         $data[] = [
                             'id' => $item->sampah_id,
                             'nama' => $sampah->nama,
                             'quantity' => $item->quantity,
                             'purchase_price' => $item->unit_price,
-                            'selling_price' => 0,
+                            'selling_price' => $sellingPrice,
                             'purchase_total' => $purchaseTotal,
                             'selling_total' => $sellingTotal,
                         ];
@@ -176,6 +208,68 @@ class BanksampahSalesController extends Controller
                     'data' => $data,
                     'message' => 'Data found!'
                 ];
+            }
+        }
+
+        return $out;
+    }
+
+    public function actionDispatchWaste() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+        ];
+
+        if (
+            isset($_POST['id']) 
+        ) {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try {
+                $salesDetail = SalesDetail::find()->where([
+                    'sales_id' => $_POST['id']
+                ])->all();
+                $sales = Sales::findOne($_POST['id']);
+                $bankSampahId = null;
+                $bankSampahCode = null;
+                if ($sales) {
+                    $sales->status = "DONE";
+                    $bankSampahSales = BanksampahSales::findOne($sales->banksampah_sales_id);
+                    if ($bankSampahSales) {
+                        $bankSampahSales->status = "DONE";
+                        $bankSampahSales->save();
+                    }
+                    $bankSampah = Mbanksampah::findOne($sales->banksampah_id);
+                    if ($bankSampah && $sales->save()) {
+                        $bankSampahId = $bankSampah->id;
+                        $bankSampahCode = $bankSampah->banksampahid;
+                    }
+                }
+                $isSaved = true;
+                foreach($salesDetail as $item) {
+                    $stock = new Stock();
+                    $stock->idstock = (string) round(microtime(true) * 1000);
+                    $stock->idjnssampah = $item->sampah_id;
+                    $stock->nilai = $item->amount_kg;
+                    $stock->jnsstock = 'OUT';
+                    $stock->tgl = date('Y-m-d');
+                    $stock->created_at = date('Y-m-d H:i:s');
+                    $stock->banksampah_id = $bankSampahId;
+                    $stock->banksampah_code = $bankSampahCode;
+                    if ($stock->validate() && $stock->save()) {
+                        $isSaved = $isSaved & true;
+                    }else {
+                        $isSaved = $isSaved & false;
+                    }
+                }
+                if ($isSaved) {
+                    $transaction->commit();
+                    $out['success'] = true;
+                }else {
+                    $transaction->rollBack();
+                }
+            } catch (\Exception $e) {
+                $transaction->rollback();
             }
         }
 
@@ -263,45 +357,140 @@ class BanksampahSalesController extends Controller
                 if ($user) {
                     $sales->from_banksampah_id = $user->banksampah_id;
                 }
-                if ($sales->validate()) {
-                    $sales->save();
+                $detailSaved = true;
+                if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
                     foreach ($data as $item) {
                         $salesDetail = new BanksampahSalesDetail();
                         $salesDetail->banksampah_sales_id = $sales->id;
                         $salesDetail->sampah_id = $item->id;
                         $salesDetail->quantity = $item->weight;
+                        $salesDetail->unit_price = $item->harga;
                         $salesDetail->amount = $item->weight * $item->harga;
                         if ($salesDetail->validate()) {
                             if ($salesDetail->save()) {
-                                
-                                // pickup process
-                                // $stock = new Stock();
-                                // $stock->idstock = (string) round(microtime(true) * 1000);
-                                // $stock->idjnssampah = $item->id;
-                                // $stock->nilai = $item->weight;
-                                // $stock->jnsstock = 'OUT';
-                                // $stock->tgl = $_POST['sales_date'];
-                                // if ($stock->validate()) {
-                                //     $stock->save();
-                                //     $out = [
-                                //         'success' => true,
-                                //         'id' => $sales->id,
-                                //     ];
-                                // }
+                                $detailSaved = $detailSaved && true;
+                            }else {
+                                $detailSaved = $detailSaved && false;
                             }
                         }
                     }
-                    $transaction->commit();     
+                    if ($detailSaved) {
+                        $out = [
+                            'success' => true,
+                            'message' => 'Data has been saved!'
+                        ];
+                        $transaction->commit();
+                    }
                 }else {
-                    echo '<pre>';
-                    print_r($sales->errors);
-                    die;
+                    $out['message'] = $sales->errors;
+                    $transaction->rollback();
                 }
             } catch (\Exception $e) {
-                echo '<pre>';
-                print_r($e->getMessage());
-                die;
+                $out['message'] = $e->getMessage();
+                $transaction->rollback();
+            }
+        }
+
+        return $out;
+    }
+
+    public function actionSubmit2()
+    {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        // eg. SO00001 SO1104220001
+        $out = [
+            'success' => false,
+        ];
+
+        if (
+            isset($_POST['id']) &&
+            isset($_POST['vendor_id']) &&
+            isset($_POST['phone'])
+        ) {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            try {
+                $bankSampahSales = BanksampahSales::findOne($_POST['id']);
+                $vendor = Vendor::findOne($_POST['vendor_id']);
+                $saved = true;
+                if ($bankSampahSales && $vendor) {
+                    $sales = new Sales();
+                    $sales->vendor_id = $_POST['vendor_id'];
+                    $sales->code = $this->generateBanksampahSalesCode();
+                    $sales->sales_date = date('Y-m-d H:i:s');
+                    $sales->total = $bankSampahSales->total;
+                    $sales->status = 'SELLING_PROCESS';
+                    if ($sales->validate() && $sales->save()) {
+                        $vendor->phone = $_POST['phone'];
+                        $vendor->save();
+                        
+                        $details = BanksampahSalesDetail::find()->where([
+                            'banksampah_sales_id' => $_POST['id']
+                        ])->all();
+                        if (sizeof($details) > 0) {
+                            foreach ($details as $item) {
+                                $vendorWaste = VendorWaste::find()->where([
+                                    'vendor_id' => $vendor->id,
+                                    'idsampah' => $item->sampah_id
+                                ])->one();
+                                $sellingPrice = 0;
+                                if ($vendorWaste) {
+                                    $sellingPrice = $vendorWaste->price_kg; 
+                                }else {
+                                    $sellingPrice = ($vendor->percentage_profit * $item->unit_price) + $item->unit_price;
+                                }
+                                $salesDetail = new SalesDetail();
+                                $salesDetail->sales_id = $sales->id;
+                                $salesDetail->sampah_id = $item->sampah_id;
+                                $salesDetail->amount_kg = $item->quantity;
+                                $salesDetail->total_price = $item->quantity * $sellingPrice;
+                                if ($salesDetail->validate()) {
+                                    if ($salesDetail->validate() && $salesDetail->save()) {
+                                        $saved = $saved && true;
+                                        // Do this on delivery process
+                                        // $stock = new Stock();
+                                        // $stock->idstock = (string) round(microtime(true) * 1000);
+                                        // $stock->idjnssampah = $item->id;
+                                        // $stock->nilai = $item->weight;
+                                        // $stock->jnsstock = 'OUT';
+                                        // $stock->tgl = $_POST['sales_date'];
+                                        // if ($stock->validate()) {
+                                        //     $stock->save();
+                                        //     $out = [
+                                        //         'success' => true,
+                                        //         'id' => $sales->id,
+                                        //     ];
+                                        // }
+                                    }else {
+                                        $saved = $saved && false;
+                                        echo '<pre>';
+                                        print_r($salesDetail->errors);
+                                        break;
+                                        die;
+                                    }
+                                }else {
+                                    echo "<pre>";
+                                    print_r($salesDetail);
+                                    die;
+                                }
+                            }
+                        }
+                        if ($saved) {
+                            $out = [
+                                'success' => true,
+                            ];
+                            $transaction->commit(); 
+                        }    
+                    }else {
+                        echo '<pre>';
+                        print_r($sales->errors);
+                        die;
+                    }
+                }
+                
+            } catch (\Exception $e) {
+                $out['message'] = $e->getMessage();
                 $transaction->rollback();
             }
         }
@@ -335,6 +524,8 @@ class BanksampahSalesController extends Controller
                     $sales->sales_date = date('Y-m-d H:i:s');
                     $sales->total = $bankSampahSales->total;
                     $sales->status = 'SELLING_PROCESS';
+                    $sales->banksampah_sales_id = $bankSampahSales->id;
+                    $sales->banksampah_id = $bankSampahSales->from_banksampah_id;
                     if ($sales->validate() && $sales->save()) {
                         $vendor->phone = $_POST['phone'];
                         $vendor->save();
@@ -383,17 +574,40 @@ class BanksampahSalesController extends Controller
                             }
                         }
                         if ($saved) {
+                            $out = [
+                                'success' => true,
+                                'message' => 'Data has been saved!'
+                            ];
                             $transaction->commit(); 
                         }    
                     }
                 }
                 
             } catch (\Exception $e) {
+                $out = [
+                    'success' => false,
+                    'message' => $e->getMessage()
+                ];
                 $transaction->rollback();
             }
         }
 
         return $out;
+    }
+
+    private function generateBanksampahSalesCode() {
+        $currDate = date('Y-m-d');
+        $sales = BanksampahSales::find()->where([
+            'DATE(transaction_date)' => $currDate
+        ])->orderBy('id DESC')->one();
+        $prevIndex = 0;
+        if ($sales) {
+            $prevIndex = (int) substr($sales->code, 8);
+        }
+        $newIndex = $prevIndex + 1;
+        $code = "BS" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
+        
+        return $code;
     }
 
     private function generateSalesCode() {

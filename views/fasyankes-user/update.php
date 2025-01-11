@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\FasyankesUser */
@@ -9,7 +10,6 @@ $this->title = Yii::t('app', 'Update Pengguna: ', [
     'modelClass' => 'User',
 ]) . $model->idfas;
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Pengguna'), 'url' => ['index']];
-$this->params['breadcrumbs'][] = ['label' => $model->idfas, 'url' => ['view', 'id' => $model->idfas]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
 ?>
 <div class="fasyankes-user-update">
