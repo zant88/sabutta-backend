@@ -6,6 +6,7 @@ use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\models\BanksampahSales;
+use app\modules\user\models\User;
 
 /**
  * BanksampahSalesSearch represents the model behind the search form of `app\models\BanksampahSales`.
@@ -57,11 +58,15 @@ class BanksampahSalesSearch extends BanksampahSales
             return $dataProvider;
         }
 
+        if (!Yii::$app->user->can("admin")) {
+            $user = User::findOne(Yii::$app->user->id);
+            $query->where(['from_banksampah_id' => $user->banksampah_id]);
+        }
+
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'from_banksampah_id' => $this->from_banksampah_id,
-            'to_banksampah_id' => $this->to_banksampah_id,
+            'from_banksampah_id' => $this->to_banksampah_id,
             'transaction_date' => $this->transaction_date,
             'created_at' => $this->created_at,
             'created_by' => $this->created_by,

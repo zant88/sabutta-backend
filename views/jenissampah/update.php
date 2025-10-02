@@ -26,12 +26,6 @@ $url = \yii\helpers\Url::to(['banksampah/list']);
 $canConfigureBankSampahPrice = false;
 if (Yii::$app->user->can('admin')) {
   $canConfigureBankSampahPrice = true;
-}else {
-  $user = User::findOne(Yii::$app->user->id);
-  $bankSampah = Mbanksampah::findOne($user->banksampah_id);
-  if ($bankSampah->parent_id == null || $bankSampah->parent_id == '') { 
-    $canConfigureBankSampahPrice = true;
-  }
 }
 
 ?>
@@ -94,16 +88,16 @@ if (Yii::$app->user->can('admin')) {
                   ?>
                 </div>
               </div>
-              <div class="col-lg-3">
+              <!-- <div class="col-lg-3">
                 <div class="form-group">
-                  <label>Harga Beli per KG (Rp)</label>
-                  <input type="number" id="amount-price" class="form-control">
+                  <label>Harga BS per KG (Rp)</label>
+                  <input placeholder="harga BS ke user" type="number" id="amount-price" class="form-control">
                 </div>
-              </div>
+              </div> -->
               <div class="col-lg-3">
                 <div class="form-group">
-                  <label>Harga Jual per KG (Rp)</label>
-                  <input type="number" id="amount-sold-price" class="form-control">
+                  <label>Beli Ke BS per KG</label>
+                  <input type="number" placeholder="harga beli ke bank sampah" id="amount-sold-price" class="form-control">
                 </div>
               </div>
             </div>
@@ -114,8 +108,7 @@ if (Yii::$app->user->can('admin')) {
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Vendor</th>
-                <th scope="col">Harga Beli</th>
-                <th scope="col">Harga Jual</th>
+                <th scope="col">Harga Beli ke BS</th>
               </tr>
             </thead>
             <tbody id="detail-addition">
@@ -140,8 +133,8 @@ if (Yii::$app->user->can('admin')) {
           <tr>
             <th scope="col">#</th>
             <th scope="col">Bank Sampah</th>
-            <th scope="col">Harga Beli</th>
-            <th scope="col">Harga Jual</th>
+            <th scope="col">Harga BS ke customer</th>
+            <th scope="col">Harga Beli ke BS</th>
             <!-- <th scope="col"></th> -->
           </tr>
           <?php 
@@ -244,11 +237,9 @@ $('#btn-add').on('click', function(e){
   var str_id = $('#user-selection').val();
   var arr_id = str_id.split(' - ');
   var id = arr_id[1];
-  var amountPrice = $('#amount-price').val();
   var isAdding = true;
   var data = $('#user-selection').select2('data');
   var text = data[0].text;
-  var amountPrice = $('#amount-price').val();
   var amountSoldPrice = $('#amount-sold-price').val();
   
   userList.forEach(function(item){
@@ -258,24 +249,22 @@ $('#btn-add').on('click', function(e){
   });
 
   if (isAdding) {
+    console.log('this is');
     userList.push({id: id, text: text});
     $('#detail-addition').append(
       `<tr>
         <td scope=\"row\">\${iAdd+1}</td><td>\${text}</td>
-        <td>\${numberWithCommas(amountPrice)}</td>
         <td>\${numberWithCommas(amountSoldPrice)}</td>
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][id]\" value=\"\${id}\" />
-        <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][price]\" value=\"\${amountPrice}\" />
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][priceSold]\" value=\"\${amountSoldPrice}\" />
         <input type=\"hidden\" name=\"PriceDetail[\${iAdd+1}][banksampah_name]\" value=\"\${text}\" />
       </tr>`);
     iAdd++;
-    $('#amount-price').val('');
     $('#amount-sold-price').val('');
   }else {
     Swal.fire({
       title: 'Error!',
-      text: 'User telah ditambahkan!',
+      text: 'Bank sampah telah ditambahkan!',
       icon: 'error'
     });
   }

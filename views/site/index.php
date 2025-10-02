@@ -1,4 +1,5 @@
 <?php
+
 use yii\web\View;
 
 /** @var yii\web\View $this */
@@ -28,9 +29,12 @@ $this->title = 'Sabutta Dashboard';
       </div>
       <div class="card-wrap">
         <div class="card-header">
-          <h4>Bagi Hasil Hari ini</h4>
+          <h4>Item Sampah Hari ini</h4>
         </div>
-        <div id="today-trx-fee" class="card-body">
+        <!-- <div id="today-trx-fee" class="card-body">
+          Rp. 0
+        </div> -->
+        <div id="today-trx-amount" class="card-body">
           Rp. 0
         </div>
       </div>
@@ -46,7 +50,7 @@ $this->title = 'Sabutta Dashboard';
           <h4>Total Berat Bulan Ini (Kg)</h4>
         </div>
         <div id="this-month-weight" class="card-body">
-          0 Kg
+          0
         </div>
       </div>
     </div>
@@ -58,20 +62,20 @@ $this->title = 'Sabutta Dashboard';
       </div>
       <div class="card-wrap">
         <div class="card-header">
-          <h4>Total Bagi Hasil Bulan Ini</h4>
+          <h4>Total Sampah Bulan Ini</h4>
         </div>
-        <div id="this-month-trx-fee" class="card-body">
-          Rp. 0
+        <div id="this-month-item" class="card-body">
+          0
         </div>
       </div>
     </div>
-  </div>                  
+  </div>
 </div>
 <div class="row">
   <div class="col-lg-8 col-md-12 col-12 col-sm-12">
     <div class="card">
       <div class="card-header">
-        <h4>Statistics</h4>
+        <h4>Berat sampah dalam seminggu ini</h4>
         <div class="card-header-action">
           <div class="btn-group">
             <a href="#" class="btn btn-primary">Week</a>
@@ -79,9 +83,17 @@ $this->title = 'Sabutta Dashboard';
           </div>
         </div>
       </div>
-      <div class="card-body"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+      <div class="card-body">
+        <div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;">
+          <div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+            <div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div>
+          </div>
+          <div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;">
+            <div style="position:absolute;width:200%;height:200%;left:0; top:0"></div>
+          </div>
+        </div>
         <canvas id="myChart" height="608" style="display: block; width: 1003px; height: 608px;" width="1003" class="chartjs-render-monitor"></canvas>
-        <div class="statistic-details mt-sm-4">
+        <!-- <div class="statistic-details mt-sm-4">
           <div class="statistic-details-item">
             <span class="text-muted"><span class="text-primary"><i class="fas fa-caret-up"></i></span> <span id="today-increment">7%</span></span>
             <div class="detail-value" id="today-weight">0</div>
@@ -102,54 +114,105 @@ $this->title = 'Sabutta Dashboard';
             <div class="detail-value">$92,142</div>
             <div class="detail-name">This Year's Sales</div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
   <div class="col-lg-4 col-md-12 col-12 col-sm-12">
     <div class="card">
       <div class="card-header">
-        <h4>Sampah Terbanyak</h4>
+        <h4>Sampah terbanyak bulan ini</h4>
       </div>
-      <div class="card-body">             
-        
+      <div class="card-body">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nama</th>
+            <th scope="col">Jumlah</th>
+          </tr>
+        </thead>
+        <tbody id="table-data">
+        </tbody>
+      </table>
       </div>
     </div>
   </div>
 </div>
 
-<?php 
+<?php
 $this->registerJs(
-    "function numberWithCommas(x) {
+  "
+  function formatNumber(num) {
+    num = Number(num); // ensure it's a number
+    return num.toLocaleString('id-ID', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function numberWithCommas(x) {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }",
-    View::POS_READY,
-    'util-function'
+  View::POS_READY,
+  'util-function'
 );
 $this->registerJs(
-    "
+  "
     $.ajax({
         url: '/site/get-today-weight/',
         success: function(data){
-          $('#today-weight').text(numberWithCommas(data.data));
+          // console.log(`This is data \${data.data}`);
+          $('#today-weight').text(formatNumber(data.data));
+        }
+    });
+    $.ajax({
+        url: '/site/get-today-amount/',
+        success: function(data){
+          $('#today-trx-amount').text(numberWithCommas(data.data));
         }
     });
     $.ajax({
         url: '/site/get-this-month-weight/',
         success: function(data){
-          $('#this-month-weight').text(`Rp. \${numberWithCommas(data.data)}`);
+          console.log(`This is the weight \${data.data.toString().replaceAll('.', ',')}`);
+          let num = data.data.toString().replaceAll('.', ',');
+          $('#this-month-weight').text(formatNumber(data.data));
+        }
+    });
+    $.ajax({
+        url: '/site/get-this-month-item/',
+        success: function(data){
+          $('#this-month-item').text(numberWithCommas(data.data));
+        }
+    });
+    $.ajax({
+        url: '/site/get-max-waste-monthly/',
+        success: function(data){
+          // $('#this-month-item').text(formatNumber(data.data));
+          console.log(data);
+          for (i=0; i<data.data.length; i++) {
+            $('#table-data').append(
+              `<tr>
+              <th scope=\"row\">\${i+1}</th>
+              <td>\${data.data[i].nama}</td>
+              <td>\${formatNumber(data.data[i].total)}</td>
+            </tr>`
+            );
+          }
+          
         }
     });
     $.ajax({
         url: '/site/get-today-transaction-fee/',
         success: function(data){
-          $('#today-trx-fee').text(`Rp. \${numberWithCommas(data.data)}`);
+          $('#today-trx-fee').text(`Rp. \${formatNumber(data.data)}`);
         }
     });
     $.ajax({
         url: '/site/get-this-month-transaction-fee/',
         success: function(data){
-          $('#this-month-trx-fee').text(`Rp. \${numberWithCommas(data.data)}`);
+          $('#this-month-trx-fee').text(`Rp. \${formatNumber(data.data)}`);
         }
     });
     var arrLabel = [];
@@ -158,7 +221,50 @@ $this->registerJs(
         url: '/site/get-chart-weekly/',
         success: function(data){
           data.data.forEach(function(el){
-            arrLabel.push(el.weight);
+            arrLabel.push(el.day);
+          })
+          data.data.forEach(function(el){
+            arrWeight.push(el.weight);
+          });
+
+          var statistics_chart = document.getElementById('myChart').getContext('2d');
+          var myChart = new Chart(statistics_chart, {
+            type: 'line',
+            data: {
+              labels: arrLabel,
+              datasets: [{
+                label: 'Weight',
+                data: arrWeight,
+                borderWidth: 5,
+                borderColor: '#6777ef',
+                backgroundColor: 'transparent',
+                pointBackgroundColor: '#fff',
+                pointBorderColor: '#6777ef',
+                pointRadius: 4
+              }]
+            },
+            options: {
+              legend: {
+                display: false
+              },
+              scales: {
+                yAxes: [{
+                  gridLines: {
+                    display: false,
+                    drawBorder: false,
+                  },
+                  ticks: {
+                    stepSize: 50
+                  }
+                }],
+                xAxes: [{
+                  gridLines: {
+                    color: '#fbfbfb',
+                    lineWidth: 2
+                  }
+                }]
+              },
+            }
           })
         }
     });
@@ -172,52 +278,13 @@ $this->registerJs(
           increment = ((today - yesterday) / yesterday) * 100;
         }
         $('#today-increment').text(`\${increment}%`);
-        $('#today-weight').text(today)
+        // $('#today-weight').text(today)
         console.log(data);
       }
-  });
-    var statistics_chart = document.getElementById('myChart').getContext('2d');
-
-    var myChart = new Chart(statistics_chart, {
-      type: 'line',
-      data: {
-        labels: arrLabel,
-        datasets: [{
-          label: 'Statistics',
-          data: arrWeight,
-          borderWidth: 5,
-          borderColor: '#6777ef',
-          backgroundColor: 'transparent',
-          pointBackgroundColor: '#fff',
-          pointBorderColor: '#6777ef',
-          pointRadius: 4
-        }]
-      },
-      options: {
-        legend: {
-          display: false
-        },
-        scales: {
-          yAxes: [{
-            gridLines: {
-              display: false,
-              drawBorder: false,
-            },
-            ticks: {
-              stepSize: 150
-            }
-          }],
-          xAxes: [{
-            gridLines: {
-              color: '#fbfbfb',
-              lineWidth: 2
-            }
-          }]
-        },
-      }
     });
+    ;
     ",
-    View::POS_READY,
-    'aggregate-function'
+  View::POS_READY,
+  'aggregate-function'
 );
 ?>

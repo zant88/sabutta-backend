@@ -89,7 +89,7 @@ class StockSearch extends Stock
         }
         if (!Yii::$app->user->can("admin")) {
             $user = User::findOne(Yii::$app->user->id);
-            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
+            $query->andFilterWhere(['stock.banksampah_id' => $user->banksampah_id]);
         }
         $query->andFilterWhere([
             'nilai' => $this->nilai,
@@ -189,7 +189,7 @@ class StockSearch extends Stock
         }
         if (!Yii::$app->user->can("admin")) {
             $user = User::findOne(Yii::$app->user->id);
-            $query->andFilterWhere(['banksampah_id' => $user->banksampah_id]);
+            $query->andFilterWhere(['stock.banksampah_id' => $user->banksampah_id]);
         }
         if ($this->userName != null) {
             $query->joinWith('order.user')->andFilterWhere(['like', 'namafas', $this->userName]);

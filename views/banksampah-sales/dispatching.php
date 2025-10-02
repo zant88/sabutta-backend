@@ -128,7 +128,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 
 <?php $this->beginBlock('scripts') ?>
-<script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+<script src="/js/vue3.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.12.2/dist/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 

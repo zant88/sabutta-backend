@@ -9,6 +9,8 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\models\Balance;
+use app\models\Usermap;
 use yii\db\Query;
 
 /**
@@ -129,8 +131,27 @@ class FasyankesUserController extends MyController
             if ($model) {
                 $model->pass = md5('enviro');
                 $model->save();
-                $out = ['success' => true];
-                return $out;
+                $userMap = Usermap::find()->where([
+                    'userid' => $_POST['id']
+                ])->one();
+                if (!$userMap) {
+                    $userMap = new Usermap();
+                }
+                $milliseconds = round(microtime(true) * 1000);
+                $userMap->idmap = (string) $milliseconds;
+                $userMap->userid = $_POST['id'];
+                $userMap->pwd = md5('enviro');
+                $userMap->idbank = $model->banksampah_code;
+                $userMap->tglinput = date('Y-m-d H:i:s');
+                $userMap->status = 0;
+                if ($userMap->validate() && $userMap->save()) {
+                    $out = ['success' => true];
+                    return $out;
+                }else {
+                    echo '<pre>';
+                    print_r($userMap->errors);
+                    die;
+                }
             }
         } else {
             return $this->render('reset-password');
@@ -158,8 +179,18 @@ class FasyankesUserController extends MyController
 
     public function actionUpdateSaldo($id) {
         $model = $this->findModel($id);
+        $balance = Balance::find()->where([
+            'idfas'=> $id
+        ])->one();
+        $isSaved = false;
+        if ($balance) {
+            $balance->saldo = $model->saldo;
+            if ($balance->validate() && $balance->save()) {
+                $isSaved = true;
+            }
+        }
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
+        if ($model->load(Yii::$app->request->post()) && $model->save() && $isSaved) {
             Yii::$app->session->setFlash('success', "Saldo telah berhasil diupdate!");
             return $this->redirect(['index']);
         } else {

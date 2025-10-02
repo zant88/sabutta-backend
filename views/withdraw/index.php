@@ -1,6 +1,6 @@
 <?php
 
-
+use app\models\FasyankesUser;
 use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
@@ -12,7 +12,19 @@ if (Yii::$app->user->can("admin")) {
             'attribute'=> 'customer',
             'label' => Yii::t('app', 'Customer'),
             'value' => function($data) {
-                return $data->idfas." - ".$data->customer->namafas;
+                
+                if ($data->idfas != null) {
+                    $customer = FasyankesUser::findOne($data->idfas);
+                    if ($customer) {
+                        return $data->idfas." - ".$customer->namafas;
+                    }else {
+                        return $data->idfas;
+                    }
+                    
+                }else {
+                    return "-";
+                }
+                
                 // return $data->job->name;
             }
         ],
@@ -62,7 +74,12 @@ if (Yii::$app->user->can("admin")) {
             'attribute'=> 'customer',
             'label' => Yii::t('app', 'Customer'),
             'value' => function($data) {
-                return $data->idfas." - ".$data->customer->namafas;
+                if ($data->customer) {
+                    return $data->idfas." - ".$data->customer->namafas;
+                }else {
+                    return $data->idfas." - ";
+                }
+                
                 // return $data->job->name;
             }
         ],

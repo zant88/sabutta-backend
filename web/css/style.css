@@ -3004,3 +3004,8 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
   display: flex;
   align-items: end;
 }
+
+
+.select2-container {
+  display: block;
+}

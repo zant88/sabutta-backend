@@ -31,6 +31,9 @@ use yii\helpers\ArrayHelper;
             <div class="col-lg-12">
                 <?= $form->field($model, 'address')->textarea(['rows' => 6]) ?>
             </div>
+            <div class="col-lg-12">
+                <?= $form->field($model, 'is_saving')->checkbox() ?>
+            </div>
             <?php 
             if (Yii::$app->user->can("admin")) {
                 $bsList = Mbanksampah::find()->orderBy('full_name')->all();

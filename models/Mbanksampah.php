@@ -15,6 +15,7 @@ use Yii;
  * @property string|null $phone_number
  * @property string|null $address
  * @property string|null $json
+ * @property int|null $is_saving
  * @property string $created_at
  * @property string $updated_at
  */
@@ -37,6 +38,7 @@ class Mbanksampah extends \yii\db\ActiveRecord
             [['banksampahid', 'full_name', 'email', 'phone_number'], 'required'],
             [['address', 'json'], 'string'],
             [['parent_id'], 'number'],
+            [['is_saving'], 'integer'],
             [['created_at', 'updated_at'], 'safe'],
             [['banksampahid'], 'string', 'max' => 50],
             [['full_name', 'email'], 'string', 'max' => 100],
@@ -53,13 +55,14 @@ class Mbanksampah extends \yii\db\ActiveRecord
     {
         return [
             'id' => Yii::t('app', 'ID'),
-            'banksampahid' => Yii::t('app', 'Banksampahid'),
+            'banksampahid' => Yii::t('app', 'Code'),
             'parent_id' => Yii::t('app', 'Parent'),
             'full_name' => Yii::t('app', 'Full Name'),
             'email' => Yii::t('app', 'Email'),
             'phone_number' => Yii::t('app', 'Phone Number'),
             'address' => Yii::t('app', 'Address'),
             'json' => Yii::t('app', 'Json'),
+            'is_saving' => Yii::t('app', 'Is Saving'),
             'created_at' => Yii::t('app', 'Created At'),
             'updated_at' => Yii::t('app', 'Updated At'),
         ];

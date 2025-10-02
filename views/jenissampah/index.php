@@ -1,6 +1,6 @@
 <?php
 
-
+use app\models\Mbanksampah;
 use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
@@ -22,13 +22,25 @@ $gridColumns = [
             $price = 0;
             $data = json_decode($model->json);        
             $dataArray = json_decode(json_encode($data), true);
-            $dataArray = $dataArray['vendors'];
+            try {
+                $dataArray = $dataArray['vendors'];
+            
+            }catch (Exception $e) {
+                $dataArray = [];
+            
+            }
             if (Yii::$app->user->can('admin')) {
                 return $model->hargaperkg;
             }else {
                 $user = User::findOne(Yii::$app->user->id); 
                 foreach ($dataArray as $j => $itemSampah) {
-                    if ($itemSampah['vendorId'] == $user->banksampah_code) {
+                    $bsCode = $user->banksampah_code;
+                    if (!$bsCode) {
+                        $bankSampah = Mbanksampah::findOne($user->banksampah_id);
+                        $bsCode = $bankSampah->banksampahid;
+                    }
+                    if ($itemSampah['vendorId'] == $bsCode) {
+                        
                         $price = $itemSampah['hargaBeli'];
                     }
                 }
@@ -71,8 +83,13 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
         <div class="card-body">
             <p>
+                <?php 
+                if (Yii::$app->user->can('admin')) {
+                    ?>
                 <?= Html::a(Yii::t('app', 'Sampah Baru'), ['create'], ['class' => 'btn btn-success']) ?>
-
+                    <?php
+                }
+                ?>
             </p>
             <p>
                 <?php 

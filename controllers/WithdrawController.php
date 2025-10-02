@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Balance;
 use app\models\FasyankesUser;
 use app\models\Histkeu;
 use Yii;
@@ -91,12 +92,20 @@ class WithdrawController extends Controller
         if ($model->load(Yii::$app->request->post())) {
             if ($model->status == 'transferred') {
                 $user = FasyankesUser::find()->where(['idfas' => $model->idfas])->one();
-                if ($user) {
+                $balance = Balance::find()->where(['idfas'=>$model->idfas])->one();
+                if ($user && $balance) {
                     $user->saldo = $user->saldo - $model->amount;
-                    $user->save();
-                    $model->save();
-                    Yii::$app->session->setFlash('success', "Data telah berhasil diubah!");
-                    return $this->redirect(['index']);
+                    $balance->initsaldo = $user->saldo;
+                    if ($user->saldo >= 0) {
+                        if ($user->save() && $model->save() && $balance->save()) {
+                            Yii::$app->session->setFlash('success', "Transaksi penarikan telah berhasil dibuat!");
+                            return $this->redirect(['index']);
+                        }
+                    }
+                    Yii::$app->session->setFlash('error', "Saldo tidak boleh minus!");
+                    return $this->render('update', [
+                        'model' => $model,
+                    ]);
                 }
                 
             }else {

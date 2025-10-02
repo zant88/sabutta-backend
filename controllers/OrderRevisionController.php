@@ -2,7 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\FasyankesUser;
 use app\models\Mbanksampah;
+use app\models\Order;
 use app\models\Orderdetail;
 use Yii;
 use app\models\OrderRevision;
@@ -112,6 +114,16 @@ class OrderRevisionController extends Controller
                             $orderDetail->berat = $orderDetail->berat - $item['berat'];
                             $orderDetail->harga = $unitPrice * $orderDetail->berat;
                             $orderDetail->save();
+                            $order = Order::findOne($orderDetail->orderid);
+                            if ($order) {
+                                $fasyankes = FasyankesUser::find()->where([
+                                    'idfasyankes' => $order->idfasyankes
+                                ])->one();
+                                if ($fasyankes) {
+                                    $fasyankes->saldo = $fasyankes->saldo - $orderDetail->harga;
+                                    $fasyankes->save();
+                                }
+                            }
                         }
                         if ($modelDetail->save()) {
                             $detRet = $detRet && true;

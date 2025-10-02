@@ -2,7 +2,7 @@ version: '2'
 services:
   php:
     # image: yiisoftware/yii2-php:7.4-apache
-    container_name: indev_sabutta-php
+    container_name: sabutta_backoffice_php
     image: yiisoftware/yii2-php:8.0-apache
     ports:
       - '6083:80'
@@ -10,31 +10,31 @@ services:
       - ~/.composer-docker/cache:/root/.composer/cache:delegated
       - ./:/app:delegated
     networks:
-      - sabutta_indev
+      - sabutta_backoffice
 
-  db:
-    container_name: indev_sabutta-dbnew
-    image: mysql:5.5
-    networks:
-      - sabutta_indev
-    environment:
-      MYSQL_DATABASE: sabutta
-      # So you don't have to use root, but you can if you like
-      MYSQL_USER: admin
-      # You can use whatever password you like
-      MYSQL_PASSWORD: admin
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: Fasyankes!@#
-    ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - '2306:3306'
-    expose:
-      # Opens port 3306 on the container
-      - '2306'
-      # Where our data will be persisted
-    volumes:
-      - my-db:/var/lib/mysql
-      - /home/sabuta/sabutta-backend/db:/etc/mysql
+  # db:
+  #   container_name: indev_sabutta-dbnew
+  #   image: mysql:5.5
+  #   networks:
+  #     - sabutta_indev
+  #   environment:
+  #     MYSQL_DATABASE: sabutta
+  #     # So you don't have to use root, but you can if you like
+  #     MYSQL_USER: admin
+  #     # You can use whatever password you like
+  #     MYSQL_PASSWORD: admin
+  #     # Password for root access
+  #     MYSQL_ROOT_PASSWORD: Fasyankes!@#
+  #   ports:
+  #     # <Port exposed> : < MySQL Port running inside container>
+  #     - '2306:3306'
+  #   expose:
+  #     # Opens port 3306 on the container
+  #     - '2306'
+  #     # Where our data will be persisted
+  #   volumes:
+  #     - my-db:/var/lib/mysql
+  #     - /home/sabuta/sabutta-backend/db:/etc/mysql
   
 #   db:
 #      container_name: sabutta_api-dbnew
@@ -60,57 +60,57 @@ services:
 #       - my-db:/var/lib/mysql
 #       - /home/sabuta/sabutta-backend/db:/etc/mysql
   
-  api-service:
-    container_name: indev_sabutta-api_service
-    image: indev_sabutta_api-service
-    build:
-      context: ./java
-    depends_on:
-      - db
-    ports:
-      - "6090:8090"
-    networks:
-      - sabutta_indev
-  
-  proxy-service:
-    container_name: indev_sabutta-proxy_service
-    image: indev_sabutta_proxy-service
-    build:
-      context: ./java/proxy
-    depends_on:
-      - db
-    ports:
-      - "7999:8091"
-    networks:
-      - sabutta_indev
-
-  # web-app:
-  #   container_name: indev_sabutta-web_app
-  #   image: indev_sabutta_api-web-app
+  # api-service:
+  #   container_name: indev_sabutta-api_service
+  #   image: indev_sabutta_api-service
   #   build:
-  #     context: ./web-app
-  #     dockerfile: Dockerfile
+  #     context: ./java
+  #   depends_on:
+  #     - db
   #   ports:
-  #     - "6085:80"
+  #     - "6090:8090"
+  #   networks:
+  #     - sabutta_indev
   
-  phpmyadmin:
-    container_name: indev_sabutta-phpmyadmin
-    image: phpmyadmin/phpmyadmin
-    links: 
-      - db:db
+  # proxy-service:
+  #   container_name: indev_sabutta-proxy_service
+  #   image: indev_sabutta_proxy-service
+  #   build:
+  #     context: ./java/proxy
+  #   depends_on:
+  #     - db
+  #   ports:
+  #     - "7999:8091"
+  #   networks:
+  #     - sabutta_indev
+
+  web-app:
+    container_name: indev_sabutta-web_app
+    image: indev_sabutta_api-web-app
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
     ports:
-      - 6084:80
-    networks:
-      - sabutta_indev
-    environment:
-      MYSQL_USER: admin
-      MYSQL_PASSWORD: admin
-      MYSQL_ROOT_PASSWORD: Fasyankes!@#
-      PMA_HOST: db
+      - "6085:80"
+  
+  # phpmyadmin:
+  #   container_name: indev_sabutta-phpmyadmin
+  #   image: phpmyadmin/phpmyadmin
+  #   links: 
+  #     - db:db
+  #   ports:
+  #     - 6084:80
+  #   networks:
+  #     - sabutta_indev
+  #   environment:
+  #     MYSQL_USER: admin
+  #     MYSQL_PASSWORD: admin
+  #     MYSQL_ROOT_PASSWORD: Fasyankes!@#
+  #     PMA_HOST: db
 
 
 networks: 
-  sabutta_indev:
+  sabutta_backoffice:
 
-volumes:
-  my-db:
+# volumes:
+#   my-db:

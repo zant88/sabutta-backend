@@ -9,9 +9,17 @@ $gridColumns = [
     ['class' => 'yii\grid\SerialColumn'],
     'name',
     'description:ntext',
-    ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
 
 ];
+if (Yii::$app->user->can('admin')) {
+    $gridColumns = [
+        ['class' => 'yii\grid\SerialColumn'],
+        'name',
+        'description:ntext',
+        ['class' => 'app\widgets\grid\ActionColumn', 'template' => '{update} {delete}'],
+    
+    ];
+}
 /* @var $this yii\web\View */
 /* @var $searchModel app\models\WasteTypeSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
@@ -29,10 +37,13 @@ $this->params['breadcrumbs'][] = $this->title;
             <h4><?= Html::encode($this->title) ?></h4>
         </div>
         <div class="card-body">
-            <p>
+            <?php 
+                if (Yii::$app->user->can('admin')) {
+                    ?>
                 <?= Html::a(Yii::t('app', 'Waste Type Baru'), ['create'], ['class' => 'btn btn-success']) ?>
-
-            </p>
+                    <?php
+                }
+                ?>
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,

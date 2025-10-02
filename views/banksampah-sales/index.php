@@ -59,10 +59,15 @@ $this->params['breadcrumbs'][] = $this->title;
       <h4><?= Html::encode($this->title) ?></h4>
     </div>
     <div class="card-body">
+      <?php 
+      if (!Yii::$app->user->can('admin')) {
+        ?>
       <p>
         <?= Html::a('Banksampah Sales Baru', ['create'], ['class' => 'btn btn-success']) ?>
-
       </p>
+        <?php 
+      }
+      ?>
       <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,

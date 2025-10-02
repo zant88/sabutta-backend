@@ -9,6 +9,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\components\MyController;
+use app\models\AppsProxy;
 use app\modules\user\models\User;
 use yii\db\Query;
 
@@ -106,8 +107,28 @@ class BanksampahController extends MyController
     {
         $model = new Mbanksampah();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $connection = \Yii::$app->db;
+            $transaction = $connection->beginTransaction();
+            $model->updated_at = $model->created_at;
+            try {
+                if ($model->validate() && $model->save()) {
+                    $appProxy = new AppsProxy();
+                    $appProxy->idapps = $model->banksampahid;
+                    $appProxy->desk = "BS ".$model->full_name;
+                    $appProxy->value = '{"baseUrl":"http://api-service:8090","logo":"http://103.150.196.160:7800/down/hTDufGS38Dav.png"}';
+                    if ($appProxy->validate() && $appProxy->save()) {
+                        $transaction->commit();
+                        return $this->redirect(['index']);
+                    }
+                }else {
+                    echo '<pre>';
+                    print_r($model->errors);
+                    die;
+                }
+            }catch (\Exception $e) {
+                $transaction->rollback();
+            }
         } else {
             return $this->render('create', [
                 'model' => $model,

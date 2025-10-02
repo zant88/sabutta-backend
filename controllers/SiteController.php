@@ -111,15 +111,130 @@ class SiteController extends MyController
             'data' => 0
         ];
         $date = date('Y-m-d');
-        $query = (new \yii\db\Query())->from('order')
-            ->where("DATE(tanggalinput)='$date'");
-        $weightTotal = $query->sum('berat');
-        if (!$weightTotal) {
-            $weightTotal = 0;
+        if (Yii::$app->user->can('admin')) {
+            $query = (new \yii\db\Query())->from('order')
+                ->where("DATE(tanggalinput)='$date'");
+            $weightTotal = $query->sum('berat');
+            if (!$weightTotal) {
+                $weightTotal = 0;
+            }
+            $out = [
+                'success' => true,
+                'data' => $weightTotal
+            ];
+        }else {
+            $user  = User::findOne(Yii::$app->user->id);
+            $query = (new \yii\db\Query())->from('order')
+                ->where("DATE(tanggalinput)='$date' AND banksampah_id=".$user->banksampah_id);
+            $weightTotal = $query->sum('berat');
+            if (!$weightTotal) {
+                $weightTotal = 0;
+            }
+            $out = [
+                'success' => true,
+                'data' => $weightTotal
+            ];
+        }
+        
+
+        return $out;
+    }
+
+    /**
+     * get Today Item Amount
+     */
+    public function actionGetTodayAmount() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $date = date('Y-m-d');
+        if (Yii::$app->user->can('admin')) {
+            $query = (new \yii\db\Query())->from('orderdetail')
+                ->leftJoin('order', 'orderid=idorder')
+                ->where("DATE(tanggalinput)='$date'");
+            $itemTotal = $query->count('DISTINCT idsampah');
+        } else {
+            $user  = User::findOne(Yii::$app->user->id);
+            $query = (new \yii\db\Query())->from('orderdetail')
+                ->leftJoin('order', 'orderid=idorder')
+                ->where("DATE(tanggalinput)='$date' AND banksampah_id=".$user->banksampah_id);
+            $itemTotal = $query->count('DISTINCT idsampah');
+        }
+        
+        if (!$itemTotal) {
+            $itemTotal = 0;
         }
         $out = [
             'success' => true,
-            'data' => $weightTotal
+            'data' => $itemTotal
+        ];
+
+        return $out;
+    }
+
+    /**
+     * get Today Item Amount
+     */
+    public function actionGetMaxWasteMonthly() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $date = date('Y-m-d');
+        // if (Yii::$app->user->can('admin')) {
+            
+        //     $query = (new \yii\db\Query())->from('orderdetail od')
+        //         ->leftJoin('order o', 'orderid=idorder')
+        //         ->leftJoin('jenissampah js', 'od.idsampah=js.idsampah')
+        //         ->where("MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year'")
+        //         ->orderBy('od.berat DESC');
+        // } else {
+        //     $user  = User::findOne(Yii::$app->user->id);
+        //     $query = (new \yii\db\Query())->from('orderdetail')
+        //         ->leftJoin('order', 'orderid=idorder')
+        //         ->where("DATE(tanggalinput)='$date' AND banksampah_id=".$user->banksampah_id);
+        //     $itemTotal = $query->count('DISTINCT idsampah');
+        // }
+        $year = date('Y');
+        $month = date('n');
+
+        if (Yii::$app->user->can('admin')) {
+            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year' AND banksampah_id=".$user->banksampah_id;
+        }
+
+        $query = (new \yii\db\Query())
+                ->select('DISTINCT(js.idsampah) as idsampah, js.nama')
+                ->from('orderdetail od')
+                ->leftJoin('order o', 'orderid=idorder')
+                ->leftJoin('jenissampah js', 'od.idsampah=js.idsampah')
+                ->where($strWhere)
+                ->orderBy('od.berat DESC')
+                ->limit(10)
+                ->all();
+        $data = [];
+        foreach ($query as $item) {
+            $strW = $strWhere." AND idsampah='".$item['idsampah']."'";
+            $queryItem = (new \yii\db\Query())->from('orderdetail od')
+                ->leftJoin('order o', 'orderid=idorder')
+                ->where($strW);
+
+            $weightTotal = $queryItem->sum('od.berat');
+            $data[] = [
+                'idsampah' => $item['idsampah'],
+                'nama' => $item['nama'],
+                'total' => $weightTotal,
+            ];
+        }
+        
+        $out = [
+            'success' => true,
+            'data' => $data
         ];
 
         return $out;
@@ -171,26 +286,27 @@ class SiteController extends MyController
             'success' => false,
             'data' => 0
         ];
-        $month = date('n');
-        $year = date('y');
-        if (Yii::$app->user->can('admin')) {
-            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year'";
-        }else {
-            $user = User::findOne(Yii::$app->user->id);
-            $strWhere = "MONTH(tanggalinput)='$month' AND YEAR(tanggalinput)='$year' AND banksampah_id=".$user->banksampah_id;
-        }
         $dates = [];
         for ($i=1;$i<=7; $i++) {
             $date = date('Y-m-d', strtotime("-$i days"));
-            $strWhere = "tanggalinput = '".$date."'";
-            $query = (new \yii\db\Query())->from('order')
+            
+            if (Yii::$app->user->can('admin')) {
+                $strWhere = "DATE(tanggalinput) = '".$date."'";
+            }else {
+                $user = User::findOne(Yii::$app->user->id);
+                $strWhere = "DATE(tanggalinput) = '".$date."' AND banksampah_id=".$user->banksampah_id;
+            }
+            $query = (new \yii\db\Query())->from('orderdetail od')
+                ->leftJoin('order o', 'orderid=idorder')
                 ->where($strWhere);
-            $weightTotal = $query->sum('berat');
+
+            $weightTotal = $query->sum('od.berat');
             if (!$weightTotal) {
                 $weightTotal = 0;
             }
             $dates[] = [
-                'day' => date('l', strtotime($date)),
+                'date' => $date,
+                'day' => date('D', strtotime($date))." ".date('j/m', strtotime($date)),
                 'weight' => $weightTotal
             ];
         }
@@ -295,15 +411,46 @@ class SiteController extends MyController
             $user = User::findOne(Yii::$app->user->id);
             $strWhere = "MONTH(tanggalinput)='$month' AND banksampah_id=".$user->banksampah_id;
         }
-        $query = (new \yii\db\Query())->from('order')
-            ->where($strWhere);
-        $weightTotal = $query->sum('berat');
+        $query = (new \yii\db\Query())->from('orderdetail od')
+                ->leftJoin('order o', 'orderid=idorder')
+                ->where($strWhere);
+        $weightTotal = $query->sum('od.berat');
         if (!$weightTotal) {
             $weightTotal = 0;
         }
         $out = [
             'success' => true,
             'data' => $weightTotal
+        ];
+
+        return $out;
+    }
+    /**
+     * get Today Weight
+     */
+    public function actionGetThisMonthItem() {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $out = [
+            'success' => false,
+            'data' => 0
+        ];
+        $month = date('n');
+        if (Yii::$app->user->can('admin')) {
+            $strWhere = "MONTH(tanggalinput)='$month'";
+        }else {
+            $user = User::findOne(Yii::$app->user->id);
+            $strWhere = "MONTH(tanggalinput)='$month' AND banksampah_id=".$user->banksampah_id;
+        }
+        $query = (new \yii\db\Query())->from('orderdetail')
+                ->leftJoin('order', 'orderid=idorder')
+                ->where($strWhere);
+        $itemTotal = $query->count('DISTINCT idsampah');
+        if (!$itemTotal) {
+            $itemTotal = 0;
+        }
+        $out = [
+            'success' => true,
+            'data' => $itemTotal
         ];
 
         return $out;

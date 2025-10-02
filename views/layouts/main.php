@@ -93,17 +93,19 @@ AppAsset::register($this);
 
       </footer>
     </div>
+
+    <?php 
+    if ($this->blocks) {
+      if (array_key_exists('modal', $this->blocks)) {
+        echo $this->blocks['modal'];
+      }
+      if (array_key_exists('scripts', $this->blocks)) {
+        echo $this->blocks['scripts'];
+      }
+    }
+    ?>
   </div>
-  <?php 
-  if ($this->blocks) {
-    if (array_key_exists('modal', $this->blocks)) {
-      echo $this->blocks['modal'];
-    }
-    if (array_key_exists('scripts', $this->blocks)) {
-      echo $this->blocks['scripts'];
-    }
-  }
-  ?>
+  
   <!-- Modal -->
           
   <?php $this->endBody() ?>

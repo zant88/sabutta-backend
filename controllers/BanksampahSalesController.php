@@ -17,6 +17,7 @@ use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use app\modules\user\models\User;
+use Exception;
 
 /**
  * BanksampahSalesController implements the CRUD actions for BanksampahSales model.
@@ -121,20 +122,36 @@ class BanksampahSalesController extends Controller
     {
         $model = new BanksampahSales();
         $sampahPrice = [];
+        $isSaving = false;
         if (!Yii::$app->user->can('admin')) {
             $user = User::findOne(Yii::$app->user->id);
             $sampahList = Jenissampah::find()->where([
                 'status' => 'AKTIF'
             ])->all();
+            $bankSampah = Mbanksampah::findOne($user->banksampah_id);
+            if ($bankSampah) {
+                $isSaving = $bankSampah->is_saving == 1 ? true : false;
+                // echo $isSaving;
+                // die;
+            }
             foreach ($sampahList as $item) {
                 $detail = json_decode($item->json);
-                $priceConfigs = $detail->vendors;
+                // echo '<pre>';
+                // print_r($detail);
+                // die;
+                try {
+                    $priceConfigs = $detail->vendors;
+                }catch (Exception $e) {
+                    $priceConfigs = [];
+                }
+                // $priceConfigs = $detail->vendors;
                 foreach ($priceConfigs as $itemPrice) {
                     if ($itemPrice->vendorId == $user->banksampah_code) {
                         $sampahPrice[] = [
                             'id' => $item->idsampah,
                             'name' => $item->nama,
-                            'price' => $itemPrice->hargaJual
+                            'price' => $itemPrice->hargaJual,
+                            'buying_price' => $itemPrice->hargaBeli
                         ];
                     }
                 }
@@ -146,7 +163,8 @@ class BanksampahSalesController extends Controller
         } else {
             return $this->render('create', [
                 'model' => $model,
-                'sampahPrice' => $sampahPrice
+                'sampahPrice' => $sampahPrice,
+                'isSaving' => $isSaving
             ]);
         }
     }
@@ -210,8 +228,32 @@ class BanksampahSalesController extends Controller
                 ];
             }
         }
-
         return $out;
+    }
+
+    public function actionGetStock($id) {
+        \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $user = User::findOne(Yii::$app->user->id);
+        $rowsIn = (new \yii\db\Query())
+            ->select(['sum(nilai) as stockIn'])
+            ->from('stock')
+            ->where([
+                'jnsstock'=>'IN', 
+                'idjnssampah'=>$id,
+                'banksampah_id'=>$user->banksampah_id
+            ])
+            ->one();
+        $rowsOut = (new \yii\db\Query())
+            ->select(['sum(nilai) as stockOut'])
+            ->from('stock')
+            ->where([
+                'jnsstock'=>'OUT', 
+                'idjnssampah'=>$id,
+                'banksampah_id'=>$user->banksampah_id
+            ])
+            ->one();
+        $amount = ($rowsIn['stockIn'] - $rowsOut['stockOut']);
+        return $amount;
     }
 
     public function actionDispatchWaste() {
@@ -358,8 +400,18 @@ class BanksampahSalesController extends Controller
                     $sales->from_banksampah_id = $user->banksampah_id;
                 }
                 $detailSaved = true;
+                $processedTransaction = true;
                 if ($sales->validate() && $sales->save()) {
                     $data = json_decode($_POST['items']);
+                    // $data = json_decode($_POST['items']);
+                    $listWaste = [];
+                    foreach ($data as $itemWaste) {
+                        $listWaste[] = [
+                            'idwaste' => $itemWaste->id,
+                            'currentPrice' => $itemWaste->hargaBeli,
+                            'priceAdjustment' => $itemWaste->harga,
+                        ];
+                    }
                     foreach ($data as $item) {
                         $salesDetail = new BanksampahSalesDetail();
                         $salesDetail->banksampah_sales_id = $sales->id;
@@ -375,12 +427,23 @@ class BanksampahSalesController extends Controller
                             }
                         }
                     }
+                    $data = [
+                        'userId' => Yii::$app->user->id,
+                        'salesCode' => $sales->code,
+                        'listWaste' => $listWaste
+                    ];
                     if ($detailSaved) {
+                        $transaction->commit();
+                        // $processedTransaction = $this->processTransaction('https://api.sabutta.co.id/trxadjustment', $data);
+                    
+                    }
+                    // echo $processedTransaction;
+                    // die;
+                    if ($processedTransaction && $detailSaved) {
                         $out = [
                             'success' => true,
                             'message' => 'Data has been saved!'
                         ];
-                        $transaction->commit();
                     }
                 }else {
                     $out['message'] = $sales->errors;
@@ -533,7 +596,6 @@ class BanksampahSalesController extends Controller
                             'banksampah_sales_id' => $_POST['id']
                         ])->all();
                         if (sizeof($details) > 0) {
-                            // $data = json_decode($_POST['items']);
                             foreach ($details as $item) {
                                 $vendorWaste = VendorWaste::find()->where([
                                     'vendor_id' => $vendor->id,
@@ -623,5 +685,58 @@ class BanksampahSalesController extends Controller
         $code = "BS" . date('dmy') . str_pad($newIndex, 4, '0', STR_PAD_LEFT);
         
         return $code;
+    }
+
+    private function processTransaction($url, $data) {
+        // The URL of the external endpoint
+        // $url = 'https://example.com/api/submit';
+
+        // Data to be sent in the POST request
+        // $data = [
+        //     'name' => 'John Doe',
+        //     'email' => 'john.doe@example.com',
+        //     'message' => 'Hello, this is a test message.'
+        // ];
+        // print_r($data);
+        // die;
+        
+        $ret = false;
+        // Initialize cURL
+        $ch = curl_init($url);
+        $jsonData = json_encode($data);
+
+        // Set the options for the cURL request
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); // Return the response as a string
+        curl_setopt($ch, CURLOPT_POST, true); // Set the request method to POST
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData); // Set the POST data
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'Content-Type: application/json',
+            'Content-Length: ' . strlen($jsonData)
+        ]);
+
+        // Execute the cURL request and store the response
+        $response = curl_exec($ch);
+        // Check for cURL errors
+        if (curl_errno($ch)) {
+            // echo 'cURL error: ' . curl_error($ch);
+            $ret = false;
+        } else {
+            // Check the HTTP status code
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            if ($httpCode == 200) {
+                $ret = true;
+                // echo 'Success! Response: ' . $response;
+                // die;
+            } else {
+                $ret = false;
+                // echo 'HTTP error: ' . $httpCode . ' Response: ' . $response;
+                // die;
+            }
+        }
+
+        // Close the cURL session
+        curl_close($ch);
+
+        return $ret;
     }
 }

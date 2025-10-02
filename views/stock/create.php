@@ -11,16 +11,14 @@ $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Daftar Stock'), 'url
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="stock-create">
-<div class="card">
+  <div class="card">
     <div class="card-header">
-        <h4><?= Html::encode($this->title) ?></h4>
+      <h4><?= Html::encode($this->title) ?></h4>
     </div>
     <div class="card-body">
-        <?= $this->render('_form', [
-            'model' => $model,
-        ]) ?>
+      <?= $this->render('_form', [
+        'model' => $model,
+      ]) ?>
     </div>
-</div>
-    
-
+  </div>
 </div>

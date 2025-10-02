@@ -35,7 +35,6 @@ $this->title = Yii::t('app', 'Daftar Pegawai');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="driver-index">
-    <?php Pjax::begin(); ?>
     <?php // echo $this->render('_search', ['model' => $searchModel]); 
     ?>
     <div class="card">
@@ -45,13 +44,17 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="card-body">
             <p>
                 <?= Html::a(Yii::t('app', 'Pegawai Baru'), ['create'], ['class' => 'btn btn-success']) ?>
+                <?= Html::a(Yii::t('app', 'Reset Password'), ['reset-password'], ['class' => 'btn btn-info']) ?>
             </p>
+            <?php Pjax::begin(); ?>
+    
             <?= GridView::widget([
                 'dataProvider' => $dataProvider,
                 'filterModel' => $searchModel,
                 'columns' => $gridColumns,
             ]); ?>
+            <?php Pjax::end(); ?>
         </div>
     </div>
-    <?php Pjax::end(); ?>
+    
 </div>

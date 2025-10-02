@@ -3,6 +3,7 @@
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use app\models\Mbanksampah;
 
 /* @var $this yii\web\View */
 /* @var $model app\models\Driver */
@@ -21,6 +22,7 @@ use yii\widgets\ActiveForm;
         </div>
         <?php 
         if (Yii::$app->user->can("admin")) {
+            $bsList = Mbanksampah::find()->orderBy('full_name')->all();
             ?>
         <div class="col-lg-6">
             <?= $form->field($model, 'nmperusahaan')->dropDownList($bs_list); ?>

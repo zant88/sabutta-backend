@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Driver;
 use yii\helpers\Html;
 use app\widgets\grid\GridView;
 use yii\widgets\Pjax;
@@ -14,8 +15,8 @@ use yii\helpers\ArrayHelper;
 $this->title = Yii::t('app', 'Reset Password');
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="fasyankes-user-index">
-  <?php Pjax::begin(); ?>
+<div class="driver-index">
+  <!-- <?php Pjax::begin(); ?> -->
   <?php // echo $this->render('_search', ['model' => $searchModel]); 
   ?>
 
@@ -28,12 +29,12 @@ $this->params['breadcrumbs'][] = $this->title;
 <?php 
   //use app\models\Country;
   if (Yii::$app->user->can('admin')) {
-    $users=FasyankesUser::find()->all();
+    $users=Driver::find()->all();
   }else {
     $user = User::findOne(Yii::$app->user->id);
     $bankSampah = Mbanksampah::findOne($user->banksampah_id);
-    $users=FasyankesUser::find()->where([
-      'banksampah_code' => $bankSampah->banksampahid
+    $users=Driver::find()->where([
+      'nmperusahaan' => $bankSampah->banksampahid
     ])->all();
   }
   //use yii\helpers\ArrayHelper;
@@ -43,7 +44,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?php
         foreach ($users as $item) {
         ?>
-          <option value="<?= $item->idfas ?>"><?= $item->namafas ?></option>
+          <option value="<?= $item->iddriver ?>"><?= $item->nama ?></option>
         <?php
         }
         ?>
@@ -53,7 +54,7 @@ $this->params['breadcrumbs'][] = $this->title;
       </p>
     </div>
   </div>
-  <?php Pjax::end(); ?>
+  <!-- <?php Pjax::end(); ?> -->
 </div>
 
 <?php 
@@ -77,7 +78,7 @@ $this->registerJs(
       e.preventDefault();
       if ($('#user').val() != '') {
         $.ajax({
-          url: '/fasyankes-user/reset-password',
+          url: '/driver/reset-password',
           type: 'POST',
           data: {
             id: $('#user').val(),
@@ -90,7 +91,7 @@ $this->registerJs(
               icon: 'success',
               confirmButtonText: 'Ok'
             }).then(() => {
-              window.location.href = '/fasyankes-user/';
+              window.location.href = '/driver/';
             });
           } 
         });

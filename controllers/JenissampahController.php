@@ -184,8 +184,15 @@ class JenissampahController extends MyController
     {
         $model = $this->findModel($id);
         $hargaDiterima = 0;
-        $user = User::findOne(Yii::$app->user->id); 
-        $userBSCode = $user->banksampah_code;
+        $user = User::findOne(Yii::$app->user->id);
+        $userBSCode = ''; 
+        if (!Yii::$app->user->can('admin')) {
+            $userBSCode = $user->banksampah_code;
+            if (!$userBSCode) {
+                $bankSampah = Mbanksampah::findOne($user->banksampah_id);
+                $userBSCode = $bankSampah->banksampahid;
+            }
+        }
         if ($model->json) {
             $data = json_decode($model->json);        
             $dataArray = json_decode(json_encode($data), true);
@@ -195,7 +202,7 @@ class JenissampahController extends MyController
                 
                 if ($userBSCode == $itemSampah['vendorId']) {
                     if (!Yii::$app->request->isPost) {
-                        $model->hargaBS = $itemSampah['hargaBeli'];
+                        $model->hargaBS = array_key_exists('hargaBeli', $itemSampah) ? $itemSampah['hargaBeli'] : 0;
                     }
                     $hargaDiterima = $itemSampah['hargaJual'];
                 }
@@ -225,10 +232,9 @@ class JenissampahController extends MyController
                                     $parentId = $bankSampah->parent_id;
                                 }   
                                 $isNew = false;
-                                // $item->hargaPerKg = $itemPost['price'];
                                 $dataArray[$i]['vendorName'] = $itemPost['banksampah_name'];
                                 $dataArray[$i]['parentId'] = $parentId;
-                                $dataArray[$i]['hargaBeli'] = $itemPost['price'];
+                                // $dataArray[$i]['hargaBeli'] = $itemPost['price'];
                                 $dataArray[$i]['hargaJual'] = $itemPost['priceSold'];
                             }
                         }
@@ -242,9 +248,14 @@ class JenissampahController extends MyController
                             $obj->vendorId = $itemPost['id'];
                             $obj->vendorName = $itemPost['banksampah_name'];
                             $obj->parentId = $parentId;
-                            $obj->hargaBeli = $itemPost['price'];
+                            // $obj->hargaBeli = $itemPost['price'];
                             $obj->hargaJual = $itemPost['priceSold'];
                             $data->vendors[] = $obj;
+                            $dataArray[sizeof($postData)]['vendorId'] =  $itemPost['id'];
+                            $dataArray[sizeof($postData)]['vendorName'] = $itemPost['banksampah_name'];
+                            $dataArray[sizeof($postData)]['parentId'] = $parentId;
+                            // $dataArray[sizeof($postData)]['hargaBeli'] = $itemPost['price'];
+                            $dataArray[sizeof($postData)]['hargaJual'] = $itemPost['priceSold'];
                         }
                     }
                     $model->json = json_encode([
@@ -253,6 +264,7 @@ class JenissampahController extends MyController
                 }
 
                 if (!Yii::$app->user->can('admin')) {
+                    
                     $detRet = true;
                     $isNew = true;
                     if ($model->json) {
@@ -264,14 +276,13 @@ class JenissampahController extends MyController
                             if ($userBSCode == $itemSampah['vendorId']) {
                                 $isNew = false;
                                 $bankSampah = Mbanksampah::find()->where([
-                                    'banksampahid' => $user->banksampah_code
+                                    'banksampahid' => $userBSCode
                                 ])->one();
                                 $vendorName = "";
                                 if ($bankSampah) {
                                     $vendorName = $bankSampah->full_name;
-                                }   
+                                }
                                 $isNew = false;
-                                // $itemSampah->hargaPerKg = $model->hargaperkg;
                                 $dataArray[$j]['vendorName'] = $vendorName;
                                 $dataArray[$j]['hargaBeli'] = $_POST['Jenissampah']['hargaBS'];
                                 $dataArray[$j]['hargaJual'] = $itemSampah['hargaJual'];

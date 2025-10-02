@@ -46,7 +46,7 @@ class Driver extends \yii\db\ActiveRecord
             [['userid'], 'string', 'max' => 10],
             [['pass', 'tokenfb'], 'string', 'max' => 255],
             [['role'], 'string', 'max' => 100],
-            [['iddriver'], 'unique'],
+            [['iddriver', 'telpdriver'], 'unique'],
         ];
     }
 

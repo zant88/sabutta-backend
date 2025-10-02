@@ -17,10 +17,31 @@ use kartik\select2\Select2;
   <!-- ADDED HERE -->
   <div class="row">
     <div class="col-lg-6">
-      <?= $form->field($model, 'idsampah')->textInput(['maxlength' => true]) ?>
+      <?php 
+      if ($canConfigureBankSampahPrice){ 
+        ?>
+        <?= $form->field($model, 'idsampah')->textInput(['maxlength' => true]) ?>
+        <?php
+      }else {
+        ?>
+        <?= $form->field($model, 'idsampah')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+        <?php 
+      }
+      ?>
+      
     </div>
     <div class="col-lg-6">
-      <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
+    <?php 
+      if ($canConfigureBankSampahPrice){ 
+        ?>
+        <?= $form->field($model, 'nama')->textInput(['maxlength' => true]) ?>
+        <?php
+      }else {
+        ?>
+        <?= $form->field($model, 'nama')->textInput(['maxlength' => true, 'disabled' => true]) ?>
+        <?php 
+      }
+      ?>
     </div>
     <div class="col-lg-6">
     <?php 
@@ -52,11 +73,25 @@ use kartik\select2\Select2;
       ?>
     </div>
     <div class="col-lg-6">
-      <?= $form->field($model, 'status')
+      <?php 
+      if ($canConfigureBankSampahPrice){ 
+        ?>
+        <?= $form->field($model, 'status')
         ->dropDownList(
           ['AKTIF' => 'AKTIF', 'NON AKTIF' => 'NON AKTIF'],
           ['prompt' => '', 'id' => 'waste_type_id']
         ); ?>
+        <?php
+      }else {
+        ?>
+        <?= $form->field($model, 'status')
+        ->dropDownList(
+          ['AKTIF' => 'AKTIF', 'NON AKTIF' => 'NON AKTIF'],
+          ['prompt' => '', 'id' => 'waste_type_id', 'disabled' => true]
+        ); ?>
+        <?php 
+      }
+      ?>
     </div>
     <!-- <div class="col-lg-6">
       <?= 
@@ -72,14 +107,26 @@ use kartik\select2\Select2;
      
     </div> -->
     <div class="col-lg-6">
-      <?php
+    <?php 
       $wasteType = WasteType::find()->orderBy('name')->all();
-      ?>
-      <?= $form->field($model, 'waste_type_id')
+      if ($canConfigureBankSampahPrice){ 
+        ?>
+        <?= $form->field($model, 'waste_type_id')
         ->dropDownList(
           ArrayHelper::map($wasteType, 'id', 'name'),
           ['prompt' => '', 'id' => 'waste_type_id']
         ); ?>
+        <?php
+      }else {
+        ?>
+        <?= $form->field($model, 'waste_type_id')
+        ->dropDownList(
+          ArrayHelper::map($wasteType, 'id', 'name'),
+          ['prompt' => '', 'id' => 'waste_type_id', 'disabled' => true]
+        ); ?>
+        <?php 
+      }
+      ?>
     </div>
   </div>
 

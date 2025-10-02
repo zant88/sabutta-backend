@@ -115,7 +115,7 @@ class DriverController extends MyController
                         $userMap = new Usermap();
                         $userMap->idmap = (string) $milliseconds;
                         $userMap->userid = $model->userid;
-                        $userMap->pwd = $model->pass;
+                        $userMap->pwd = md5('enviro');
                         $userMap->idbank = $model->nmperusahaan;
                         $userMap->tglinput = date('Y-m-d H:i:s');
                         $userMap->status = 0;
@@ -129,9 +129,18 @@ class DriverController extends MyController
                         }
                     }
                 }else {
-                    echo '<pre>';
-                    print_r($model->errors);
-                    die;
+                    $errors = $model->getErrors();
+                    $errorMessages = [];
+                    foreach ($errors as $attribute => $messages) {
+                        foreach ($messages as $message) {
+                            $errorMessages[] = $message;
+                        }
+                    }
+                    Yii::$app->session->setFlash('error', implode('<br>', $errorMessages));
+                    return $this->render('create', [
+                        'model' => $model,
+                        'mrole' => $mrole,
+                    ]);
                 }
             }else {
                 Yii::$app->session->setFlash('error', "Data gagal disimpan! Tidak ada konfigurasi apps");
@@ -165,6 +174,43 @@ class DriverController extends MyController
                 'model' => $model,
                 'mrole' => $mrole
             ]);
+        }
+    }
+
+    public function actionResetPassword()
+    {
+        if (isset($_POST['id'])) {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+            $out = ['success' => false];
+
+            $model = Driver::findOne($_POST['id']);
+            if ($model) {
+                $model->pass = md5('enviro');
+                $model->save();
+                $userMap = Usermap::find()->where([
+                    'userid' => $_POST['id']
+                ])->one();
+                if (!$userMap) {
+                    $userMap = new Usermap();
+                }
+                $milliseconds = round(microtime(true) * 1000);
+                $userMap->idmap = (string) $milliseconds;
+                $userMap->userid = $_POST['id'];
+                $userMap->pwd = md5('enviro');
+                $userMap->idbank = $model->nmperusahaan;
+                $userMap->tglinput = date('Y-m-d H:i:s');
+                $userMap->status = 0;
+                if ($userMap->validate() && $userMap->save()) {
+                    $out = ['success' => true];
+                    return $out;
+                }else {
+                    echo '<pre>';
+                    print_r($userMap->errors);
+                    die;
+                }
+            }
+        } else {
+            return $this->render('reset-password');
         }
     }
 

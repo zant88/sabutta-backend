@@ -1,14 +1,32 @@
+// const {
+//   createApp,
+//   ref,
+//   toRaw
+// } = Vue;
+
+// createApp({
+  
+// }).mount('#app');
 var vm = new Vue({
   el: "#app",
-  data: {
-    selected: 2,
-    weight: 0,
-    total: 0,
-    sampah: '',
-    vendor_id: 0,
-    sales_date: '',
-    items: [],
-    waste_list: [],
+  data(){
+    return {
+      selected: 2,
+      weight: 0,
+      total: 0,
+      sampah: '',
+      vendor_id: 0,
+      sales_date: '',
+      items: [],
+      waste_list: [],
+      selected_stock: 0,
+      selling_price: 0,
+      buying_price: 0,
+      is_saving: false
+    }
+  },
+  mounted() {
+    console.log(this.is_saving);
   },
   methods: {
     add() {
@@ -16,6 +34,13 @@ var vm = new Vue({
         Swal.fire({
           title: 'Error!',
           text: 'Anda belum memasukan jumlah sampah!',
+          icon: 'error',
+          confirmButtonText: 'Ok'
+        });
+      }else if (this.weight > this.selected_stock) {
+        Swal.fire({
+          title: 'Error!',
+          text: 'Anda tidak boleh memasukan jumlah melebihi stock sambah!',
           icon: 'error',
           confirmButtonText: 'Ok'
         });
@@ -27,7 +52,7 @@ var vm = new Vue({
         var total = parseInt(price) * this.weight;
         this.total = this.total + total;
         var id = strID.split('-')[0];
-        this.items.push({ id: id, name: strData, weight: this.weight, harga: price, total: total });
+        this.items.push({ id: id, name: strData, weight: this.weight, harga: price, hargaBeli: this.buying_price, total: total });
       }
     },
     remove(index) {
@@ -49,6 +74,23 @@ var vm = new Vue({
         });
         console.log(that.waste_list);
       })
+    },
+    // checkStock() {
+      
+    // },
+    getStock() {
+      console.log(this.$refs.jenissampah.value);
+      var waste_id = this.$refs.jenissampah.value.split(' - ')[0];
+      var sellingPrice = this.$refs.jenissampah.value.split(' - ')[1];
+      var buyingPrice = this.$refs.jenissampah.value.split(' - ')[2];
+      const that = this;
+      axios.get(`/banksampah-sales/get-stock/?id=${waste_id}`).then(response => {
+        console.log(response.data);
+        that.selected_stock = response.data;
+        that.weight = 0;
+      });
+      this.selling_price = sellingPrice;
+      this.buying_price = buyingPrice;
     },
     save() {
       if (this.items.length == 0) {

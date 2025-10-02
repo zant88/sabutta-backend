@@ -18,7 +18,11 @@ $dataColumn = [
       if ($order) {
         if ($order->idfasyankes != null) {
           $user = FasyankesUser::findOne($order->idfasyankes);
-          return $user->namafas;
+          if ($user) {
+            return $user->namafas;
+          }else {
+            return '-';
+          }
         } else {
           return '-';
         }
@@ -73,8 +77,12 @@ $dataColumn = [
     'label' => 'Tanggal',
     'value' => function ($model) {
       if ($model->jnsstock == 'IN') {
-        $order = Order::findOne($model->idorder);
-        $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $order->tanggalinput);
+        if ($model->idorder != null) {
+          $order = Order::findOne($model->idorder);
+          $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $order->tanggalinput);
+        }else {
+          $myDateTime = DateTime::createFromFormat('Y-m-d H:i:s', $model->created_at);
+        }
         if ($myDateTime) {
           $newDateString = $myDateTime->format('d/m/Y H:i:s');
         } else {

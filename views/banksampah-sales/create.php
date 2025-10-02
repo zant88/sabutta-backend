@@ -1,6 +1,7 @@
 <?php
 
 use app\models\Jenissampah;
+use app\models\Mbanksampah;
 use yii\helpers\Html;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
@@ -54,26 +55,46 @@ if (Yii::$app->user->can('admin')) {
               </div>
             </div>
             <div class="card-body">
+              <input type="hidden" v-model="is_saving" value="<?= $isSaving==1? true : false ?>" />
               <div class="input-container-sales">
                 <div class="sampah-container">
                   <label class="control-label">Sampah</label>
-                  <select id="jenissampah" class="form-control" ref="jenissampah">
+                  <select id="jenissampah" @change="getStock" class="form-control" ref="jenissampah">
                     <!-- <option v-for="item in waste_list" :value="item.id">{{ item.waste_name }}</option> -->
                     <?php 
                       foreach ($sampahPrice as $item) {
                         ?>
-                        <option value="<?= $item['id'] ?> - <?= $item['price'] ?>"><?= $item['name'] ?></option>
+                        <option value="<?= $item['id'] ?> - <?= $item['price'] ?> - <?= $item['buying_price'] ?>"><?= $item['name'] ?></option>
                         <?php
                       } 
                     ?>
                   </select>
                 </div>
                 <div class="form-group amount-container">
-                  <label>Berat</label>
+                  <label>Berat {{ selected_stock != 0 ? '('+selected_stock+' Kg)' : '(0)' }}</label>
                   <div class="input-group">
                     <input v-model="weight" type="text" class="form-control currency">
                   </div>
                 </div>
+                <div class="form-group price-container">
+                  <label>Harga Jual ke Sabutta</label>
+                  <div class="input-group">
+                    <input v-model="selling_price" disabled type="text" class="form-control currency">
+                  </div>
+                </div>
+                <?php 
+                  if ($isSaving) {
+                    ?>
+                <div class="form-group price-container">
+                  <label>Harga Beli ke Konsumen</label>
+                  <div class="input-group">
+                    <input v-model="buying_price" type="text" class="form-control currency">
+                  </div>
+                </div>
+                    <?php
+                  }
+                ?>
+                
                 <div class="form-group add-container">
                   <a href="javascript:void(0)" v-on:click="add()" class="btn btn-primary"><i class="fas fa-check"></i> Add</a>
                 </div>
@@ -84,7 +105,8 @@ if (Yii::$app->user->can('admin')) {
                     <th>#</th>
                     <th>Nama Sampah</th>
                     <th>Berat (Kg)</th>
-                    <th>Harga Satuan</th>
+                    <th>Harga Jual</th>
+                    <th>Harga Konsumen</th>
                     <th>Total</th>
                     <th></th>
                   </tr>
@@ -93,6 +115,7 @@ if (Yii::$app->user->can('admin')) {
                     <td>{{ item.name }}</td>
                     <td>{{ item.weight }}</td>
                     <td>Rp. {{ numberWithCommas(item.harga) }}</td>
+                    <td>Rp. {{ numberWithCommas(item.hargaBeli) }}</td>
                     <td>Rp. {{ numberWithCommas(item.total) }}</td>
                     <td>
                       <a href="javacript:void(0)" v-on:click="remove(i)">
@@ -126,7 +149,7 @@ if (Yii::$app->user->can('admin')) {
   $this->registerCssFile("@web/css/daterangepicker.css", [], 'css-print-theme');
 
   $this->registerJsFile(
-    'https://unpkg.com/vue@2',
+    'https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js',
     ['depends' => [\yii\web\JqueryAsset::class]]
   );
 
@@ -162,7 +185,7 @@ if (Yii::$app->user->can('admin')) {
   $this->registerJs(
     "$(document).ready(function() {
       setTimeout(function() {
-        $('#jenissampah').select2();
+        // $('#jenissampah').select2();
       }, 1000);
   });", \yii\web\View::POS_READY
   );
