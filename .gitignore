@@ -32,3 +32,8 @@ tests/_support/_generated
 #vagrant folder
 /.vagrant
 web-app/sabutta-web/
+web-app/sabutta-web_old/
+wa-bot/.wwebjs_auth/
+wa-bot/node_modules/
+wa-bot/
+web/media/
